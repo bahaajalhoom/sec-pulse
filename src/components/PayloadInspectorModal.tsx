@@ -81,6 +81,16 @@ export default function PayloadInspectorModal({
     'ports',
     'subdomain',
     'headers',
+    'ssrf',
+    'idor',
+    'sensitive_files',
+    'rate_limiting',
+    'cmd_injection',
+    'cors_leak',
+    'csrf',
+    'graphql',
+    'directory_traversal',
+    'mass_assignment',
   ];
 
   const filteredProbes = localProbes.filter((p) => p.category === activeCategory);

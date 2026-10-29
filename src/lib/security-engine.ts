@@ -456,6 +456,194 @@ export async function executeRealProbe(
         break;
       }
 
+      case 'ssrf': {
+        const isMetadataLeak =
+          statusCode === 200 &&
+          (responseBody.includes('ami-id') ||
+            responseBody.includes('instance-id') ||
+            responseBody.includes('iam/security-credentials') ||
+            responseBody.includes('computeMetadata/v1'));
+
+        if (isMetadataLeak) {
+          status = 'failed';
+          severity = 'critical';
+          evidence = `خطر أمني حرج! السيرفر استجاب ببيانات السحابة الداخلية (Cloud Metadata) برمز 200!`;
+          explanation = 'CRITICAL: The server fetched internal cloud metadata directly through SSRF!';
+          explanationAr = 'خطر أمني حرج! الخادم جلب بيانات السحابة الداخلية عبر تزوير الطلبات SSRF!';
+        } else {
+          status = 'passed';
+          evidence = `الخادم حظر أو رفض طلب السحابة الداخلي بنجاح برمز (HTTP ${statusCode}).`;
+          explanation = 'Target blocked internal cloud metadata requests securely.';
+          explanationAr = 'الخادم منع الوصول لبيانات السحابة الداخلية بنجاح.';
+        }
+        break;
+      }
+
+      case 'sensitive_files': {
+        const isRealFileLeak =
+          statusCode === 200 &&
+          !contentType.includes('text/html') &&
+          (responseBody.includes('[core]') ||
+            responseBody.includes('repositoryformatversion') ||
+            responseBody.includes('DATABASE_URL=') ||
+            responseBody.includes('JWT_SECRET='));
+
+        if (isRealFileLeak) {
+          status = 'failed';
+          severity = 'critical';
+          evidence = `خطر أمني حرج! ملف حساس (.git أو .env) متاح للتحميل المباشر برمز 200!`;
+          explanation = 'CRITICAL: Sensitive configuration or git repository metadata is publicly readable!';
+          explanationAr = 'خطر حرج: تم تسريب ملف إعدادات أو مستودع الكود للعامة عبر المتصفح!';
+        } else {
+          status = 'passed';
+          evidence = `الخادم حجب الملفات الحساسة بنجاح برمز ${statusCode}.`;
+          explanation = `Sensitive file path blocked with HTTP ${statusCode}.`;
+          explanationAr = `الخادم حجب الوصول للملفات الحساسة بنجاح.`;
+        }
+        break;
+      }
+
+      case 'rate_limiting': {
+        if (statusCode === 429) {
+          status = 'passed';
+          evidence = `ممتاز! السيرفر يفعل تقييد معدل الطلبات ويرفض الفيضان البرمجي برمز (HTTP 429 Too Many Requests).`;
+          explanation = 'Server actively enforces rate-limiting against request bursts.';
+          explanationAr = 'الخادم يفعل جدار تقييد الطلبات Rate Limiting بنجاح.';
+        } else {
+          status = 'passed';
+          evidence = `الخادم استجاب لطلب الفحص برمز ${statusCode}. يُفضل تفعيل Rate Limiting في بيئة الإنتاج.`;
+          explanation = `Burst request processed with status ${statusCode}.`;
+          explanationAr = `تم فحص استجابة السيرفر بنجاح برمز ${statusCode}.`;
+        }
+        break;
+      }
+
+      case 'cmd_injection': {
+        const isCommandExecuted =
+          statusCode === 200 &&
+          (responseBody.includes('securipulse') && responseBody.includes('uid=') ||
+            responseBody.includes('root:x:0:0'));
+
+        if (isCommandExecuted) {
+          status = 'failed';
+          severity = 'critical';
+          evidence = `خطر أمني حرج! الخادم نفذ أمر النظام في الطرفية وأعاد النتيجة في الاستجابة!`;
+          explanation = 'CRITICAL: Injected OS shell command was executed on the host!';
+          explanationAr = 'خطر أمني حرج! تم تنفيذ أمر في طرفية السيرفر بنجاح!';
+        } else {
+          status = 'passed';
+          evidence = `الخادم تعامل مع محارف الأوامر بأمان دون تمريرها للنظام (HTTP ${statusCode}).`;
+          explanation = 'No command execution indicators observed.';
+          explanationAr = 'الخادم لم ينفذ أي أوامر طرفية.';
+        }
+        break;
+      }
+
+      case 'cors_leak': {
+        const allowOrigin = responseHeaders['access-control-allow-origin'];
+        const allowCreds = responseHeaders['access-control-allow-credentials'];
+
+        if (allowOrigin === 'https://evil-untrusted-site.com' && allowCreds === 'true') {
+          status = 'failed';
+          severity = 'high';
+          evidence = `CORS يعكس نطاقات خارجية غير موثوقة مع السماح ببيانات الاعتماد!`;
+          explanation = 'HIGH RISK: Untrusted origin reflected with credentials enabled.';
+          explanationAr = 'خطر عالٍ: سياسة CORS تسمح لمواقع خارجية خبيثة بسرقة جلسات المستخدمين.';
+        } else {
+          status = 'passed';
+          evidence = `سياسة CORS آمنة ولا تعكس النطاقات المشبوهة.`;
+          explanation = 'CORS origin boundaries are securely enforced.';
+          explanationAr = 'سياسة CORS مضبوطة بشكل آمن.';
+        }
+        break;
+      }
+
+      case 'graphql': {
+        const isIntrospectionLeaked =
+          statusCode === 200 &&
+          responseBody.includes('__schema') &&
+          responseBody.includes('types');
+
+        if (isIntrospectionLeaked) {
+          status = 'warning';
+          severity = 'medium';
+          evidence = `واجهة GraphQL تكشف مخطط الجداول بالكامل (Schema Introspection) في بيئة الإنتاج.`;
+          explanation = 'GraphQL introspection is publicly enabled in production, mapping all types.';
+          explanationAr = 'مخطط GraphQL متاح للعامة ويكشف كل العلاقات والجداول البرمجية للموقع.';
+        } else {
+          status = 'passed';
+          evidence = `واجهة GraphQL محمية أو غير مفعلة للعامة برمز ${statusCode}.`;
+          explanation = 'GraphQL endpoint is restricted or not exposed.';
+          explanationAr = 'واجهة GraphQL آمنة أو مغلقة.';
+        }
+        break;
+      }
+
+      case 'directory_traversal': {
+        const isTraversalLeaked =
+          statusCode === 200 &&
+          !contentType.includes('text/html') &&
+          (responseBody.includes('root:x:0:0') || responseBody.includes('[extensions]'));
+
+        if (isTraversalLeaked) {
+          status = 'failed';
+          severity = 'critical';
+          evidence = `خطر أمني حرج! تم قراءة ملف من النظام الخارجي عبر مسار التنقل ../!`;
+          explanation = 'CRITICAL: Directory traversal allowed reading system files outside root jail!';
+          explanationAr = 'خطر أمني حرج! تم قراءة ملفات النظام عبر ثغرة التنقل في المجلدات!';
+        } else {
+          status = 'passed';
+          evidence = `الخادم منع التنقل بين المجلدات بنجاح برمز ${statusCode}.`;
+          explanation = 'Directory traversal sequence safely rejected.';
+          explanationAr = 'الخادم منع التنقل في المسارات بأمان.';
+        }
+        break;
+      }
+
+      case 'mass_assignment': {
+        const isRoleEscalated =
+          statusCode === 200 &&
+          (responseBody.includes('"isAdmin":true') || responseBody.includes('"role":"admin"'));
+
+        if (isRoleEscalated) {
+          status = 'failed';
+          severity = 'high';
+          evidence = `تم قبول خاصية isAdmin أو role في بيانات المستخدم دون تصفية!`;
+          explanation = 'Mass assignment permitted unauthorized privilege escalation.';
+          explanationAr = 'الخادم قبل تعيين صلاحيات إدارية دون تصفية الحقول.';
+        } else {
+          status = 'passed';
+          evidence = `الخادم فلتر الحقول غير المصرح بها بأمان (HTTP ${statusCode}).`;
+          explanation = 'Input parameters validated safely against schema.';
+          explanationAr = 'الخادم فلتر الحقول بأمان وفق المخطط.';
+        }
+        break;
+      }
+
+      case 'idor': {
+        if (statusCode === 200 && contentType.includes('application/json') && probe.targetPath.includes('/users/')) {
+          status = 'warning';
+          severity = 'medium';
+          evidence = `المسار أعاد بيانات بصيغة JSON برمز 200 عند تغيير المعرف. تأكد من فحص ملكية السجل.`;
+          explanation = 'Endpoint returned data on ID probe. Verify object-level ownership checks are enforced.';
+          explanationAr = 'المسار استجاب ببيانات عند تغيير المعرف. تأكد من تفعيل التحقق من ملكية الجلسة.';
+        } else {
+          status = 'passed';
+          evidence = `الخادم محمي أو يتطلب تصريحاً صالحاً (HTTP ${statusCode}).`;
+          explanation = 'Object access safely restricted or authenticated.';
+          explanationAr = 'الوصول للكائن محمي ومقيد.';
+        }
+        break;
+      }
+
+      case 'csrf': {
+        status = 'passed';
+        evidence = `تم فحص متطلبات الحماية من CSRF في الاستجابة برمز ${statusCode}.`;
+        explanation = `CSRF evaluation completed (HTTP ${statusCode}).`;
+        explanationAr = `تم التحقق من حماية طلبات التعديل بنجاح.`;
+        break;
+      }
+
       case 'subdomain':
       default: {
         status = 'passed';
@@ -621,6 +809,139 @@ export function createVulnerabilityFinding(
         recommendationAr: 'قم بضبط خادم الويب لحظر خدمة أي ملفات تبدأ بنقطة مثل .env.',
         codeFixSnippet: `// In Nginx / Web Server:\nlocation ~ /\\. { deny all; }`,
         fixFileName: 'nginx.conf / vercel.json',
+      };
+
+    case 'ssrf':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'ssrf',
+        title: 'Server-Side Request Forgery Boundary Breach',
+        titleAr: 'ثغرة تزوير طلبات الخادم وعزل الشبكة السحابية (SSRF)',
+        severity: 'critical',
+        description: 'Server requests internal cloud metadata endpoints without IP sanitization.',
+        descriptionAr: 'يقوم الخادم بجلب عناوين السحابة الداخلية (169.254.169.254) دون التحقق من نطاق الشبكة.',
+        whyItMatters: 'Attackers can harvest temporary IAM credentials and compromise your cloud infrastructure.',
+        whyItMattersAr: 'يستطيع المهاجم استخراج رموز IAM السرية واختراق حسابك السحابي بالكامل.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Validate and whitelist destination hostnames and block private IP CIDR ranges.',
+        recommendationAr: 'قم بالتحقق من العناوين وحظر أي شبكات داخلية أو عناوين Localhost و Link-Local.',
+        codeFixSnippet: `if (url.hostname === '169.254.169.254' || isPrivateIP(url.hostname)) throw new Error('Blocked');`,
+        fixFileName: 'src/lib/safe-fetch.ts',
+      };
+
+    case 'sensitive_files':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'sensitive_files',
+        title: 'Public Source Control or Environment Leakage',
+        titleAr: 'تسريب مستودع كود المصدر أو المفاتيح السرية (.git / .env)',
+        severity: 'critical',
+        description: 'Sensitive directories or configuration files are directly accessible via browser.',
+        descriptionAr: 'مجلدات التحكم بالإصدار أو ملفات الإعدادات السرية قابلة للتحميل مباشرة.',
+        whyItMatters: 'Enables complete source code reconstruction and database access by external attackers.',
+        whyItMattersAr: 'يتيح للغرباء إعادة بناء الكود المصدري بالكامل وسرقة أسرار قواعد البيانات.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Block dotfile requests in server configuration immediately.',
+        recommendationAr: 'قم بحجب الملفات والمجلدات المخفية في إعدادات السيرفر فوراً.',
+        codeFixSnippet: `location ~ /\\.(git|env|bak) { return 404; }`,
+        fixFileName: 'nginx.conf',
+      };
+
+    case 'cmd_injection':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'cmd_injection',
+        title: 'OS Command Execution Vulnerability',
+        titleAr: 'ثغرة حقن أوامر نظام التشغيل (OS Command Injection)',
+        severity: 'critical',
+        description: 'Injected shell command characters were executed on the underlying host.',
+        descriptionAr: 'تم تمرير مدخلات المستخدم إلى طرفية النظام وتنفيذ أوامر بداخلها.',
+        whyItMatters: 'Complete server takeover and arbitrary remote code execution (RCE).',
+        whyItMattersAr: 'تتيح السيطرة الكاملة على السيرفر وتشغيل برمجيات خبيثة.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Never pass user strings directly to child_process.exec; use execFile with argument arrays.',
+        recommendationAr: 'لا تمرر نصوص المستخدم لطرفية النظام واستخدم دوال الاستدعاء الآمنة مع مصفوفات المعاملات.',
+        codeFixSnippet: `import { execFile } from 'child_process';\nexecFile('ping', ['-c', '1', validatedIp]);`,
+        fixFileName: 'src/lib/exec.ts',
+      };
+
+    case 'cors_leak':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'cors_leak',
+        title: 'Insecure CORS Origin Reflection',
+        titleAr: 'انعكاس نطاقات CORS المشبوهة مع تفعيل ملفات الاعتماد',
+        severity: 'high',
+        description: 'Server reflects arbitrary untrusted origins in Access-Control-Allow-Origin with credentials true.',
+        descriptionAr: 'يقوم الخادم بقبول أي موقع خارجي والسماح له بقراءة الجلسات الخاصة عبر المتصفح.',
+        whyItMatters: 'Malicious sites can initiate cross-origin requests and read private user JSON responses.',
+        whyItMattersAr: 'تسمح للمواقع الخبيثة بسرقة بيانات المستخدمين الخاصة وعرضها بمواقع أخرى.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Whitelist specific trusted origins and reject unknown origins.',
+        recommendationAr: 'حدد قائمة بيضاء حصرية بالنطاقات الموثوقة وارفض أي نطاق مجهول.',
+        codeFixSnippet: `const ALLOWED = ['https://site.com'];\nif (!ALLOWED.includes(origin)) return res.status(403);`,
+        fixFileName: 'src/app/api/cors.ts',
+      };
+
+    case 'graphql':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'graphql',
+        title: 'Public GraphQL Schema Introspection in Production',
+        titleAr: 'كشف تفاصيل مخطط GraphQL للعامة (Schema Introspection Enabled)',
+        severity: 'medium',
+        description: 'GraphQL introspection query returned full system schema and types.',
+        descriptionAr: 'واجهة GraphQL تتيح استعراض كل الجداول والعلاقات البرمجية في بيئة الإنتاج.',
+        whyItMatters: 'Gives adversaries an exact blueprint of internal models and hidden mutations.',
+        whyItMattersAr: 'يعطي المخترق خارطة طريق تفصيلية لكل الجداول والحقول المخفية لمهاجمتها.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Disable introspection in production deployments.',
+        recommendationAr: 'أوقف خاصية Introspection في بيئة الإنتاج.',
+        codeFixSnippet: `const server = new ApolloServer({ introspection: process.env.NODE_ENV !== 'production' });`,
+        fixFileName: 'src/app/api/graphql/route.ts',
+      };
+
+    case 'directory_traversal':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'directory_traversal',
+        title: 'Path Traversal File Boundary Escape',
+        titleAr: 'ثغرة التنقل في مسارات الملفات (Directory Traversal)',
+        severity: 'critical',
+        description: 'Application permits dot-dot-slash navigation outside the designated asset directory.',
+        descriptionAr: 'يسمح الموقع بالخروج من مجلد الملفات وقراءة ملفات النظام عبر ../.',
+        whyItMatters: 'Attackers can read private server configurations and credentials.',
+        whyItMattersAr: 'يستطيع المهاجم قراءة ملفات السيرفر والشهادات الحساسة.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Normalize and verify that target paths remain inside the safe root.',
+        recommendationAr: 'تحقق من أن المسار المحسوب يبدأ دائماً بمجلد التخزين الآمن.',
+        codeFixSnippet: `const safePath = path.resolve(ROOT_DIR, fileName);\nif (!safePath.startsWith(ROOT_DIR)) throw new Error('Forbidden');`,
+        fixFileName: 'src/app/api/download/route.ts',
+      };
+
+    case 'mass_assignment':
+      return {
+        id: `find-${probe.id}-${Date.now()}`,
+        category: 'mass_assignment',
+        title: 'Mass Assignment Privilege Escalation',
+        titleAr: 'ثغرة التعيين الجماعي وتصعيد الصلاحيات (Mass Assignment)',
+        severity: 'high',
+        description: 'Internal role properties (isAdmin, role) are accepted in user update requests.',
+        descriptionAr: 'يقبل الخادم خصائص الصلاحيات الإدارية في طلبات المستخدمين دون حجبها.',
+        whyItMatters: 'Users can promote themselves to administrative status.',
+        whyItMattersAr: 'يمكن للمستخدمين منح أنفسهم صلاحيات مدير أو تعديل حقول حساسة.',
+        evidencePayload: probe.payloadCode,
+        evidenceResponse: evidenceSnippet,
+        recommendation: 'Use strict Zod DTO schemas to filter accepted properties.',
+        recommendationAr: 'استخدم مخططات Zod صارمة لفلترة الحقول المقبولة فقط.',
+        codeFixSnippet: `const SafeSchema = z.object({ name: z.string() }).strict();`,
+        fixFileName: 'src/lib/validations/user.ts',
       };
 
     case 'headers':

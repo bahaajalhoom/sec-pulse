@@ -38,6 +38,16 @@ const DEFAULT_CATEGORIES: Record<VulnerabilityCategory, boolean> = {
   ports: true,
   subdomain: true,
   headers: true,
+  ssrf: true,
+  idor: true,
+  sensitive_files: true,
+  rate_limiting: true,
+  cmd_injection: true,
+  cors_leak: true,
+  csrf: true,
+  graphql: true,
+  directory_traversal: true,
+  mass_assignment: true,
 };
 
 // ============================================================================

@@ -17,6 +17,14 @@ import {
   SafetyCertificateOutlined,
   ClusterOutlined,
   FieldTimeOutlined,
+  ApiOutlined,
+  LockOutlined,
+  FileTextOutlined,
+  DesktopOutlined,
+  ShareAltOutlined,
+  SafetyOutlined,
+  FolderOpenOutlined,
+  ControlOutlined,
 } from '@ant-design/icons';
 import {
   AttackIntensity,
@@ -107,6 +115,16 @@ export default function TargetConfig({
     'ports',
     'subdomain',
     'headers',
+    'ssrf',
+    'idor',
+    'sensitive_files',
+    'rate_limiting',
+    'cmd_injection',
+    'cors_leak',
+    'csrf',
+    'graphql',
+    'directory_traversal',
+    'mass_assignment',
   ];
 
   const getCategoryIcon = (cat: VulnerabilityCategory) => {
@@ -122,8 +140,28 @@ export default function TargetConfig({
       case 'subdomain':
         return <GlobalOutlined className="text-sm text-[#1677ff]" />;
       case 'headers':
-      default:
         return <SafetyCertificateOutlined className="text-sm text-[#1677ff]" />;
+      case 'ssrf':
+        return <ApiOutlined className="text-sm text-[#1677ff]" />;
+      case 'idor':
+        return <LockOutlined className="text-sm text-[#1677ff]" />;
+      case 'sensitive_files':
+        return <FileTextOutlined className="text-sm text-[#1677ff]" />;
+      case 'rate_limiting':
+        return <FieldTimeOutlined className="text-sm text-[#1677ff]" />;
+      case 'cmd_injection':
+        return <DesktopOutlined className="text-sm text-[#1677ff]" />;
+      case 'cors_leak':
+        return <ShareAltOutlined className="text-sm text-[#1677ff]" />;
+      case 'csrf':
+        return <SafetyOutlined className="text-sm text-[#1677ff]" />;
+      case 'graphql':
+        return <ClusterOutlined className="text-sm text-[#1677ff]" />;
+      case 'directory_traversal':
+        return <FolderOpenOutlined className="text-sm text-[#1677ff]" />;
+      case 'mass_assignment':
+      default:
+        return <ControlOutlined className="text-sm text-[#1677ff]" />;
     }
   };
 
@@ -330,12 +368,12 @@ export default function TargetConfig({
             </span>
           </label>
           <span className="text-[11px] font-mono text-[#8c8c8c]">
-            {Object.values(enabledCategories).filter(Boolean).length} / 6{' '}
+            {Object.values(enabledCategories).filter(Boolean).length} / 16{' '}
             {isArabic ? 'نطاقات مفعلة' : 'Active'}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {categoryList.map((cat) => {
             const meta = CATEGORY_METADATA[cat];
             const isEnabled = enabledCategories[cat];

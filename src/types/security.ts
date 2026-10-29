@@ -10,7 +10,17 @@ export type VulnerabilityCategory =
   | 'auth'
   | 'ports'
   | 'subdomain'
-  | 'headers';
+  | 'headers'
+  | 'ssrf'
+  | 'idor'
+  | 'sensitive_files'
+  | 'rate_limiting'
+  | 'cmd_injection'
+  | 'cors_leak'
+  | 'csrf'
+  | 'graphql'
+  | 'directory_traversal'
+  | 'mass_assignment';
 
 export type SeverityLevel = 'critical' | 'high' | 'medium' | 'low' | 'info';
 

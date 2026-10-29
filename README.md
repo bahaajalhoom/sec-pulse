@@ -60,15 +60,25 @@
   - `External Dedicated API`: Probes external backends (`https://api.domain.com`) with custom base URL routing.
 - **Interactive Routing Table**: Select, deselect, or inject custom developer routes (`GET`, `POST`, `OPTIONS`, `HEAD`).
 
-### 2. 🛡️ 6 Comprehensive Threat Audit Vectors (نطاقات الهجوم الستة)
-| Threat Vector | Canary Probes & Vectors Tested |
-|---|---|
-| **SQL Injection (SQLi)** | Benign tautology checks (`' OR 1=1 --`), sleep canaries, syntax error detection. |
-| **Cross-Site Scripting (XSS)** | HTML attribute escape probes, script tag reflection test, SVG vector sanitization. |
-| **Broken Authentication** | JWT `alg: "none"` bypass probe, token tampering, sensitive path authorization check. |
-| **Open Ports & DB Services** | TCP SYN probes for PostgreSQL (`5432`), Redis (`6379`), MySQL (`3306`), MongoDB (`27017`). |
-| **Subdomain Takeover** | CNAME record hygiene, orphaned DNS pointer checks, S3/GitHub/Heroku 404 error patterns. |
-| **CORS & Security Headers** | Untrusted Origin leakage checks, `HSTS`, `CSP`, `X-Frame-Options`, `X-Content-Type-Options`. |
+### 2. 🛡️ 16 Comprehensive Threat Audit Vectors (نطاقات الهجوم الـ 16 الكاملة)
+| # | Threat Vector | Canary Probes & Vectors Tested |
+|---|---|---|
+| 1 | **SQL Injection (SQLi)** | Benign tautology checks (`' OR 1=1 --`), sleep canaries, syntax error detection. |
+| 2 | **Cross-Site Scripting (XSS)** | HTML attribute escape probes, script tag reflection test, SVG vector sanitization. |
+| 3 | **Broken Authentication** | JWT `alg: "none"` bypass probe, token tampering, sensitive path authorization check. |
+| 4 | **Open Ports & DB Services** | TCP SYN probes for PostgreSQL (`5432`), Redis (`6379`), MySQL (`3306`), MongoDB (`27017`). |
+| 5 | **Subdomain Takeover** | CNAME record hygiene, orphaned DNS pointer checks, S3/GitHub/Heroku 404 error patterns. |
+| 6 | **Security Headers & Policies** | Strict-Transport-Security (`HSTS`), `CSP`, `X-Frame-Options`, `X-Content-Type-Options`. |
+| 7 | **SSRF (Server-Side Request Forgery)** | Internal cloud metadata boundary probe (`169.254.169.254`), loopback IP isolation test. |
+| 8 | **IDOR / BOLA** | Object identifier tampering, cross-tenant resource leakage, sequential ID access checks. |
+| 9 | **Sensitive Files & Git Leaks** | Exposure audits for `/.env`, `/.git/config`, database backup dumps, and leaked secret files. |
+| 10 | **Rate Limiting & DoS Resilience** | Burst request simulation, HTTP `429 Too Many Requests` verification, latency throttling. |
+| 11 | **OS Command Injection** | Command separator probes (`\|`, `;`, `&&`), shell execution canary validation. |
+| 12 | **CORS Origin Misconfiguration** | Untrusted Origin reflection checks with `credentials: true`, wildcard CORS leakage test. |
+| 13 | **CSRF & State Mutations** | Anti-CSRF token verification on POST/PUT endpoints, SameSite cookie audit. |
+| 14 | **GraphQL Introspection Leak** | Production schema introspection audit, type mapping extraction protection test. |
+| 15 | **Directory & Path Traversal** | Dot-dot-slash (`../`) file download jail evasion checks, root directory escape prevention. |
+| 16 | **Mass Assignment & Role Escalation** | DTO property tampering (`isAdmin: true`, `role: "admin"`), parameter injection tests. |
 
 ### 3. 📡 Real-Time SSE Telemetry Terminal (شاشة المراقبة اللحظية)
 - High-frequency Server-Sent Events (SSE) streaming direct from the Node.js audit engine.

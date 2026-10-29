@@ -64,7 +64,16 @@ export default function DefenseRecipesModal({
     }
   }
 
-  const recipeKeys: RecipeKey[] = ['headers', 'sqli', 'cors', 'xss'];
+  const recipeKeys: RecipeKey[] = [
+    'headers',
+    'sqli',
+    'cors',
+    'xss',
+    'ssrf',
+    'rate_limiting',
+    'mass_assignment',
+    'idor',
+  ];
 
   return (
     <div className={STYLES.backdrop} role="dialog" aria-modal="true">
