@@ -88,8 +88,9 @@ export default function HomePage() {
   const [telemetryEvents, setTelemetryEvents] = useState<LiveTelemetryEvent[]>([]);
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
 
-  // Abort controller ref
+  // Abort controller ref & live results section ref
   const abortControllerRef = useRef<AbortController | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Ensure page always starts at top on initial mount / refresh
   React.useEffect(() => {
@@ -136,6 +137,11 @@ export default function HomePage() {
     setIsRunning(true);
     setTelemetryEvents([]);
     setAuditReport(null);
+
+    // Smoothly scroll down to live results when the test starts
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
@@ -292,7 +298,7 @@ export default function HomePage() {
         />
 
         {/* 4. Results Section Header & View Mode Switcher */}
-        <div className="pt-4 space-y-4">
+        <div ref={resultsRef} className="pt-4 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-white/[0.1]">
             <div className="flex items-center gap-2 bg-[#0c0c0e] p-1.5 rounded-xl border border-white/[0.1]">
               {/* Tab 1: Live Telemetry */}
