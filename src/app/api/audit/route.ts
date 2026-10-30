@@ -47,6 +47,12 @@ export async function POST(request: NextRequest) {
       if (body.enabledCategories && !body.enabledCategories[probe.category]) {
         return false;
       }
+      if (intensity === 'gentle' && probe.intensityLevel !== 'gentle') {
+        return false;
+      }
+      if (intensity === 'standard' && probe.intensityLevel === 'rigorous') {
+        return false;
+      }
       return true;
     });
 
