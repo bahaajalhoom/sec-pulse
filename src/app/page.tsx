@@ -128,11 +128,6 @@ export default function HomePage() {
     setTelemetryEvents([]);
     setAuditReport(null);
 
-    // Smooth scroll down to live results
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
