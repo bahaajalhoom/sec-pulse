@@ -32,7 +32,6 @@ import {
   ControlOutlined,
   FieldTimeOutlined,
 } from '@ant-design/icons';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import {
   AttackIntensity,
   DiscoveredEndpoint,
@@ -44,27 +43,6 @@ import EndpointDiscoveryPanel from './EndpointDiscoveryPanel';
 // ============================================================================
 // 2. CONFIGURATION & STYLES (ZONE 2)
 // ============================================================================
-const PRESET_TARGETS = [
-  {
-    nameAr: 'أكاديمية فلسطين الدولية',
-    nameEn: 'Palestine International Academy',
-    url: 'https://palestine-international-academy.netlify.app',
-    category: 'E-Learning Portal',
-  },
-  {
-    nameAr: 'تطبيق تاسك فلو لإدارة المهام',
-    nameEn: 'TaskFlow SaaS Platform',
-    url: 'https://taskflow.apps.taqat.academy',
-    category: 'SaaS Web Application',
-  },
-  {
-    nameAr: 'بوابة تحسين محركات البحث الذكية',
-    nameEn: 'SEO Opt Portal',
-    url: 'https://seo-opt.apps.taqat.academy',
-    category: 'Analytics Dashboard',
-  },
-];
-
 const STYLES = {
   card: 'rounded-xl border border-white/[0.1] bg-[#0c0c0e] p-5 space-y-4 shadow-sm',
   input:
@@ -222,47 +200,10 @@ export default function TargetConfig({
             </span>
           </label>
 
-          {/* Radix Dropdown Menu for Target Presets */}
-          <div className="flex items-center gap-2">
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild>
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-200 hover:text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.15] transition-all cursor-pointer select-none active:scale-95 shadow-sm"
-                >
-                  <span>{isArabic ? 'نماذج جاهزة للفحص' : 'Preset Targets'}</span>
-                  <DownOutlined className="text-[10px]" />
-                </button>
-              </DropdownMenu.Trigger>
-
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                  className="z-50 min-w-[300px] rounded-xl bg-[#141416] p-2 shadow-2xl border border-white/[0.15] text-xs text-zinc-300 font-sans"
-                  sideOffset={6}
-                  align="end"
-                >
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                    {isArabic ? 'أهداف تجريبية موثوقة' : 'Verified Test Targets'}
-                  </div>
-
-                  {PRESET_TARGETS.map((t) => (
-                    <DropdownMenu.Item
-                      key={t.url}
-                      onClick={() => onTargetUrlChange(t.url)}
-                      className="flex flex-col gap-0.5 px-3 py-2 rounded-lg cursor-pointer hover:bg-white/[0.08] hover:text-white outline-none transition-colors"
-                    >
-                      <span className="font-semibold text-white">
-                        {isArabic ? t.nameAr : t.nameEn}
-                      </span>
-                      <span className="text-[11px] text-zinc-400 font-mono truncate" dir="ltr">
-                        {t.url}
-                      </span>
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
-          </div>
+          <span className="text-[11px] font-mono text-zinc-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            <span>{isArabic ? 'جاهز للفحص المباشر' : 'Live Audit Ready'}</span>
+          </span>
         </div>
 
         {/* URL Input Bar */}
@@ -274,33 +215,20 @@ export default function TargetConfig({
             type="text"
             value={targetUrl}
             onChange={(e) => onTargetUrlChange(e.target.value)}
-            placeholder="https://example.com"
+            placeholder={isArabic ? 'https://example.com أو https://api.example.com' : 'https://yourdomain.com or https://api.yourdomain.com'}
             disabled={isRunning}
             className={`${STYLES.input} ps-10`}
             dir="ltr"
           />
         </div>
 
-        {/* Quick Clickable Preset Pills */}
-        <div className="flex items-center gap-2 flex-wrap pt-0.5">
-          <span className="text-[11px] text-zinc-400 font-medium">
-            {isArabic ? 'أهداف سريعة للتجربة:' : 'Quick targets:'}
+        <div className="flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+          <span>
+            {isArabic
+              ? 'أدخل النطاق الحي أو عنوان الخادم لبدء محاكاة الهجمات واختبار الثغرات.'
+              : 'Enter production domain or API host to execute defensive security probing.'}
           </span>
-          {PRESET_TARGETS.map((p) => (
-            <button
-              key={p.url}
-              type="button"
-              onClick={() => onTargetUrlChange(p.url)}
-              disabled={isRunning}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono transition-all cursor-pointer select-none active:scale-95 ${
-                targetUrl === p.url
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.1]'
-              }`}
-            >
-              <span>{p.url.replace('https://', '')}</span>
-            </button>
-          ))}
+          <span className="text-zinc-600">HTTPS / HTTP</span>
         </div>
       </div>
 

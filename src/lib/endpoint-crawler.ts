@@ -148,7 +148,7 @@ export async function crawlAndDiscoverEndpoints(
           if (!scriptRes.ok) return;
           const jsContent = await scriptRes.text();
 
-          // Extract absolute API URLs (e.g. https://taskflow-taqat.apps.taqat.academy/api)
+          // Extract absolute API URLs (e.g. https://api.yourdomain.com/v1)
           const apis = [
             ...jsContent.matchAll(
               /https?:\/\/[a-zA-Z0-9_\-\.]+(?::[0-9]+)?\/api[a-zA-Z0-9_\-\/]*/gi

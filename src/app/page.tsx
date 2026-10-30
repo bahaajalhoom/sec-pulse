@@ -31,7 +31,7 @@ import {
 // 2. CONFIGURATION & CONSTANTS (EASY EDIT ZONE)
 // ============================================================================
 const DEFAULT_CONFIG = {
-  initialTargetUrl: 'https://palestine-international-academy.netlify.app',
+  initialTargetUrl: '',
   defaultIntensity: 'rigorous' as AttackIntensity,
   defaultConcurrency: 4,
   defaultDelayMs: 40,
