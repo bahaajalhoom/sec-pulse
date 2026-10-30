@@ -3,7 +3,7 @@
 // ============================================================================
 // 1. IMPORTS
 // ============================================================================
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Header from '@/components/Header';
 import TargetConfig from '@/components/TargetConfig';
 import PayloadInspectorModal from '@/components/PayloadInspectorModal';
@@ -20,13 +20,19 @@ import {
 } from '@/types/security';
 import { INITIAL_PROBES } from '@/lib/constants';
 import { normalizeTargetUrl } from '@/lib/security-engine';
+import {
+  DashboardOutlined,
+  CodeOutlined,
+  SafetyCertificateOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 
 // ============================================================================
 // 2. CONFIGURATION & CONSTANTS (EASY EDIT ZONE)
 // ============================================================================
 const DEFAULT_CONFIG = {
-  initialTargetUrl: 'https://taskflow.apps.taqat.academy',
-  defaultIntensity: 'standard' as AttackIntensity,
+  initialTargetUrl: 'https://palestine-international-academy.netlify.app',
+  defaultIntensity: 'rigorous' as AttackIntensity,
   defaultConcurrency: 4,
   defaultDelayMs: 40,
 };
@@ -50,6 +56,8 @@ const DEFAULT_CATEGORIES: Record<VulnerabilityCategory, boolean> = {
   mass_assignment: true,
 };
 
+type ActiveViewTab = 'cockpit' | 'telemetry' | 'report';
+
 // ============================================================================
 // 6. MAIN COMPONENT (ZONE 6)
 // ============================================================================
@@ -57,6 +65,7 @@ export default function HomePage() {
   // --- UI & Language State ---
   const [lang, setLang] = useState<'ar' | 'en'>('ar');
   const isArabic = lang === 'ar';
+  const [activeTab, setActiveTab] = useState<ActiveViewTab>('cockpit');
 
   // --- Configuration State ---
   const [targetUrl, setTargetUrl] = useState(DEFAULT_CONFIG.initialTargetUrl);
@@ -117,12 +126,12 @@ export default function HomePage() {
     setIsRunning(true);
     setTelemetryEvents([]);
     setAuditReport(null);
+    setActiveTab('telemetry'); // Switch to live telemetry automatically
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
     try {
-      // Connect to the REAL backend audit route with live streaming enabled
       const response = await fetch('/api/audit?stream=true', {
         method: 'POST',
         headers: {
@@ -166,6 +175,8 @@ export default function HomePage() {
                 setTelemetryEvents((prev) => [...prev, payload.event]);
               } else if (payload.type === 'report' && payload.report) {
                 setAuditReport(payload.report);
+                // When report completes, switch smoothly to report view
+                setActiveTab('report');
               }
             } catch {
               // Ignore malformed chunks
@@ -210,7 +221,7 @@ export default function HomePage() {
 
   return (
     <div
-      className={`min-h-screen bg-[#000000] text-[#d9d9d9] flex flex-col font-sans selection:bg-[#1677ff] selection:text-white ${
+      className={`min-h-screen bg-[#08090d] text-[#d9d9d9] flex flex-col font-sans selection:bg-[#1677ff] selection:text-white ${
         isArabic ? 'rtl' : 'ltr'
       }`}
       dir={isArabic ? 'rtl' : 'ltr'}
@@ -225,73 +236,143 @@ export default function HomePage() {
       />
 
       {/* 2. Main Work Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Hero Section */}
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#111d2c] border border-[#153450] text-[#1677ff] text-xs font-normal">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1677ff]" />
-            <span>
-              {isArabic
-                ? 'فاحص الأمان الشبكي التفاعلي مع استكشاف الـ API الحقيقي'
-                : 'Real Network Threat Auditor with Automated API Discovery'}
-            </span>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+        {/* Navigation Tabs Bar (Cockpit / Live Telemetry / Report) */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-[#262626]">
+          <div className="flex items-center gap-1.5 bg-[#141414] p-1 rounded-xl border border-[#303030]">
+            {/* Tab 1: Cockpit */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('cockpit')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'cockpit'
+                  ? 'bg-[#1677ff] text-white shadow-sm'
+                  : 'text-[#8c8c8c] hover:text-white'
+              }`}
+            >
+              <DashboardOutlined className="text-xs" />
+              <span>{isArabic ? 'لوحة التحكم والمسارات' : 'Attack Cockpit'}</span>
+            </button>
+
+            {/* Tab 2: Live Telemetry */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('telemetry')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'telemetry'
+                  ? 'bg-[#1677ff] text-white shadow-sm'
+                  : 'text-[#8c8c8c] hover:text-white'
+              }`}
+            >
+              {isRunning ? (
+                <SyncOutlined spin className="text-xs text-[#faad14]" />
+              ) : (
+                <CodeOutlined className="text-xs" />
+              )}
+              <span>{isArabic ? 'شاشة البث المباشر' : 'Live Stream'}</span>
+              {telemetryEvents.length > 0 && (
+                <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-black/40 text-current">
+                  {telemetryEvents.length}
+                </span>
+              )}
+            </button>
+
+            {/* Tab 3: Report & Remediation */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('report')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'report'
+                  ? 'bg-[#1677ff] text-white shadow-sm'
+                  : 'text-[#8c8c8c] hover:text-white'
+              }`}
+            >
+              <SafetyCertificateOutlined className="text-xs" />
+              <span>{isArabic ? 'تقرير الثغرات والحلول' : 'Audit Report'}</span>
+              {auditReport && (
+                <span
+                  className={`font-mono font-bold text-[10px] px-1.5 py-0.2 rounded ${
+                    auditReport.score >= 80
+                      ? 'bg-[#162312] text-[#52c41a]'
+                      : auditReport.score >= 60
+                      ? 'bg-[#2b2111] text-[#faad14]'
+                      : 'bg-[#2a1215] text-[#ff4d4f]'
+                  }`}
+                >
+                  {auditReport.score}/100
+                </span>
+              )}
+            </button>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            {isArabic
-              ? 'فحص أمان موقعك ونهايات الـ API الحقيقية'
-              : 'Audit Real Web & API Endpoints Under Live Threat Probing'}
-          </h1>
-          <p className="text-xs sm:text-sm text-[#8c8c8c] max-w-3xl leading-relaxed">
-            {isArabic
-              ? 'المنصة لا تخمن مسارات وهمية! تكتشف نهايات الـ API تلقائياً من كود موقعك (أو تتيح لك كتابة مسار API منفصل)، ثم تنفذ اختبارات حقيقية على تلك النهايات للتأكد من حمايتها وترويساتها.'
-              : 'No fake static paths! Auto-discovers real API routes from your app bundle or accepts custom API hosts, then audits live endpoints for SQLi, XSS, Auth barriers, CORS, and exposed assets.'}
-          </p>
+
+          {/* Quick Engine Meta */}
+          <div className="hidden sm:flex items-center gap-2 text-xs text-[#8c8c8c] font-mono">
+            <span>PROBES: 42</span>
+            <span>•</span>
+            <span>CONCURRENCY: {concurrency}X</span>
+            <span>•</span>
+            <span className="text-[#52c41a]">ZERO-SLOP</span>
+          </div>
         </div>
 
-        {/* 3. Configuration Cockpit with API Discovery Panel */}
-        <TargetConfig
-          targetUrl={targetUrl}
-          onTargetUrlChange={setTargetUrl}
-          apiBaseUrl={apiBaseUrl}
-          onApiBaseUrlChange={setApiBaseUrl}
-          endpoints={endpoints}
-          onEndpointsChange={setEndpoints}
-          intensity={intensity}
-          onIntensityChange={setIntensity}
-          concurrency={concurrency}
-          onConcurrencyChange={setConcurrency}
-          delayMs={delayMs}
-          onDelayMsChange={setDelayMs}
-          enabledCategories={enabledCategories}
-          onToggleCategory={handleToggleCategory}
-          onOpenInspector={() => setIsInspectorOpen(true)}
-          onStartAudit={handleStartAudit}
-          onAbortAudit={handleAbortAudit}
-          isRunning={isRunning}
-          lang={lang}
-        />
+        {/* Tab Content Display */}
+        {activeTab === 'cockpit' && (
+          <TargetConfig
+            targetUrl={targetUrl}
+            onTargetUrlChange={setTargetUrl}
+            apiBaseUrl={apiBaseUrl}
+            onApiBaseUrlChange={setApiBaseUrl}
+            endpoints={endpoints}
+            onEndpointsChange={setEndpoints}
+            intensity={intensity}
+            onIntensityChange={setIntensity}
+            concurrency={concurrency}
+            onConcurrencyChange={setConcurrency}
+            delayMs={delayMs}
+            onDelayMsChange={setDelayMs}
+            enabledCategories={enabledCategories}
+            onToggleCategory={handleToggleCategory}
+            onOpenInspector={() => setIsInspectorOpen(true)}
+            onStartAudit={handleStartAudit}
+            onAbortAudit={handleAbortAudit}
+            isRunning={isRunning}
+            lang={lang}
+          />
+        )}
 
-        {/* 4. Live Telemetry Console */}
-        <LiveTelemetryConsole
-          events={telemetryEvents}
-          isRunning={isRunning}
-          onClear={handleClearLogs}
-          lang={lang}
-        />
+        {activeTab === 'telemetry' && (
+          <div className="space-y-4">
+            <LiveTelemetryConsole
+              events={telemetryEvents}
+              isRunning={isRunning}
+              onClear={handleClearLogs}
+              lang={lang}
+            />
+          </div>
+        )}
 
-        {/* 5. Executive Findings & Code Fixes Report */}
-        <FindingsSummary report={auditReport} lang={lang} />
+        {activeTab === 'report' && (
+          <div className="space-y-4">
+            <FindingsSummary report={auditReport} lang={lang} />
+          </div>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#303030] bg-[#141414] py-5 text-center text-xs text-[#8c8c8c] font-mono">
+      {/* 3. Footer */}
+      <footer className="border-t border-[#262626] bg-[#0c0d12] py-4 text-center text-xs text-[#8c8c8c]">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>SecuriPulse DevSec Platform • Ant Design Dark Enterprise Architecture</span>
-          <span>Next.js 16.4.3 • Node.js 24 • Real Network Testing</span>
+          <span>
+            {isArabic
+              ? 'SecuriPulse — منصة محاكاة الهجمات السيبرانية وفحص الثغرات الحقيقية'
+              : 'SecuriPulse — Enterprise Defensive Threat Simulator & Real Vulnerability Auditor'}
+          </span>
+          <span className="font-mono text-[11px] text-[#595959]">
+            DEVSEC OPS 2026 • ZERO AI SLOP
+          </span>
         </div>
       </footer>
 
-      {/* Modal 1: Pre-Attack Payload & Code Inspector */}
+      {/* Modals */}
       <PayloadInspectorModal
         isOpen={isInspectorOpen}
         onClose={() => setIsInspectorOpen(false)}
@@ -301,7 +382,6 @@ export default function HomePage() {
         lang={lang}
       />
 
-      {/* Modal 2: Defense Blueprints & Recipes */}
       <DefenseRecipesModal
         isOpen={isRecipesOpen}
         onClose={() => setIsRecipesOpen(false)}
