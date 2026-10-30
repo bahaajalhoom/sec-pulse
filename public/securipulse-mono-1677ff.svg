@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none"><title>SecuriPulse</title>
+  
+  <!-- Outer Defensive Shield Perimeter -->
+  <path d="M128 24 L48 54 V126 C48 180 82 226 128 238 C174 226 208 180 208 126 V54 Z" 
+        stroke="#1677ff" 
+        stroke-width="18" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <!-- Inner Telemetry Heartbeat / Pulse -->
+  <path d="M64 128 H96 L112 156 L128 72 L144 156 L160 128 H192" 
+        stroke="#1677ff" 
+        stroke-width="18" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <!-- Central Pulse Apex Node -->
+  <circle cx="128" cy="72" r="5" fill="#1677ff"/>
+</svg>

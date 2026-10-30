@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <!-- Concept B: Hex Pulse (Telemetry Node) -->
+  <polygon points="128,24 220,76 220,180 128,232 36,180 36,76" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 128H84L104 80L128 176L152 112L172 128H220" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="128" cy="176" r="6" fill="currentColor"/>
+  <circle cx="104" cy="80" r="6" fill="currentColor"/>
+</svg>

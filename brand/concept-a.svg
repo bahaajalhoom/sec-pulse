@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" fill="none">
+  <!-- Concept A: Shield Pulse (The Fortified Wave) -->
+  <path d="M128 28L48 58V126C48 178 82 226 128 238C174 226 208 178 208 126V58L128 28Z" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48 132H92L108 96L128 170L148 114L164 132H208" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

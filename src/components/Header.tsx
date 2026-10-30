@@ -4,6 +4,7 @@
 // 1. IMPORTS
 // ============================================================================
 import React from 'react';
+import BrandLogo from './BrandLogo';
 import {
   SafetyCertificateOutlined,
   BookOutlined,
@@ -50,24 +51,7 @@ export default function Header({
     <header className="border-b border-[#303030] bg-[#141414] sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Brand Identity */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#111d2c] border border-[#153450] flex items-center justify-center text-[#1677ff]">
-            <SafetyCertificateOutlined className="text-base" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-tight text-white">
-                {isArabic ? HEADER_CONFIG.titleAr : HEADER_CONFIG.title}
-              </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#1f1f1f] text-[#8c8c8c] border border-[#303030]">
-                {HEADER_CONFIG.badgeText}
-              </span>
-            </div>
-            <p className="text-[11px] text-[#8c8c8c] hidden sm:block">
-              {isArabic ? HEADER_CONFIG.taglineAr : HEADER_CONFIG.tagline}
-            </p>
-          </div>
-        </div>
+        <BrandLogo lang={lang} size="md" />
 
         {/* Live Status & Quick Action Tools */}
         <div className="flex items-center gap-2.5">

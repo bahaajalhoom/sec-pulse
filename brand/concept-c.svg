@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Concept C: Solid Cutout Shield (Negative Space Pulse) -->
+  <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M128 20L40 54V128C40 184 78 234 128 248C178 234 216 184 216 128V54L128 20ZM192 120H158L144 148L124 84L104 156L92 120H64V76L128 50L192 76V120ZM192 144V128H172L152 168L132 108L112 180L98 144H64V136H78L94 172L116 96L136 156L152 120H192V144Z"/>
+</svg>

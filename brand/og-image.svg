@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="og-glow" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#1677ff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pulse-glow" cx="80%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#13c2c2" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Deep Obsidian Canvas -->
+  <rect width="1200" height="630" fill="#08090d"/>
+  <rect width="1200" height="630" fill="url(#og-glow)"/>
+  <rect width="1200" height="630" fill="url(#pulse-glow)"/>
+
+  <!-- Subtle Blueprint Tech Grid -->
+  <g stroke="#ffffff" stroke-opacity="0.03" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Outer Precision Border -->
+  <rect x="24" y="24" width="1152" height="582" rx="16" fill="none" stroke="#303030" stroke-width="1.5"/>
+
+  <!-- Brand Mark Icon (Shield + Telemetry Pulse) -->
+  <g transform="translate(80, 80) scale(0.65)">
+    <!-- Shield Container Tile -->
+    <rect x="0" y="0" width="256" height="256" rx="48" fill="#111d2c" stroke="#153450" stroke-width="4"/>
+    <!-- Outer Defensive Shield Perimeter -->
+    <path d="M128 28 L48 58 V126 C48 180 82 226 128 238 C174 226 208 180 208 126 V58 Z" 
+          stroke="#1677ff" 
+          stroke-width="18" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+    <!-- Inner Telemetry Heartbeat / Pulse -->
+    <path d="M64 128 H96 L112 156 L128 72 L144 156 L160 128 H192" 
+          stroke="#13c2c2" 
+          stroke-width="18" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+    <circle cx="128" cy="72" r="6" fill="#13c2c2"/>
+  </g>
+
+  <!-- Brand Identity Text Block -->
+  <g transform="translate(280, 115)">
+    <!-- Category Pill -->
+    <rect x="0" y="0" width="310" height="30" rx="6" fill="#162312" stroke="#274916" stroke-width="1"/>
+    <circle cx="14" cy="15" r="4" fill="#52c41a"/>
+    <text x="26" y="20" fill="#52c41a" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" letter-spacing="1.2">
+      ENTERPRISE DEFENSIVE SIMULATOR 2026
+    </text>
+
+    <!-- Master Title -->
+    <text x="0" y="78" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" letter-spacing="-1">
+      Securi<tspan fill="#1677ff">Pulse</tspan>
+      <tspan dx="20" font-size="34" font-weight="700" fill="#8c8c8c">سيكيوريبلس</tspan>
+    </text>
+
+    <!-- Subtitle / Mission -->
+    <text x="0" y="116" fill="#d9d9d9" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="500">
+      Automated Threat Probing, Network Attack Simulation &amp; Vulnerability Auditing
+    </text>
+  </g>
+
+  <!-- Metric Badges Row -->
+  <g transform="translate(80, 300)">
+    <!-- Badge 1: 42 Probes -->
+    <rect x="0" y="0" width="240" height="110" rx="12" fill="#141414" stroke="#303030" stroke-width="1"/>
+    <text x="24" y="44" fill="#1677ff" font-family="ui-monospace, monospace" font-size="36" font-weight="800">42</text>
+    <text x="74" y="44" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="16" font-weight="600">PROBES</text>
+    <text x="24" y="78" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="600">Active Threat Vectors</text>
+    <text x="24" y="96" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="12">Gentle, Standard, Rigorous</text>
+
+    <!-- Badge 2: Live Network -->
+    <rect x="260" y="0" width="240" height="110" rx="12" fill="#141414" stroke="#303030" stroke-width="1"/>
+    <text x="284" y="44" fill="#13c2c2" font-family="ui-monospace, monospace" font-size="36" font-weight="800">100%</text>
+    <text x="284" y="78" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="600">Real Network Probes</text>
+    <text x="284" y="96" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="12">API Crawler &amp; Canary Checks</text>
+
+    <!-- Badge 3: Remediation Engine -->
+    <rect x="520" y="0" width="240" height="110" rx="12" fill="#141414" stroke="#303030" stroke-width="1"/>
+    <text x="544" y="44" fill="#52c41a" font-family="ui-monospace, monospace" font-size="36" font-weight="800">A+</text>
+    <text x="592" y="44" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="16" font-weight="600">DEVSEC</text>
+    <text x="544" y="78" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="600">AI Remediation</text>
+    <text x="544" y="96" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="12">Instant Cursor/Claude Prompts</text>
+
+    <!-- Badge 4: Clean Design -->
+    <rect x="780" y="0" width="260" height="110" rx="12" fill="#141414" stroke="#303030" stroke-width="1"/>
+    <text x="804" y="44" fill="#faad14" font-family="ui-monospace, monospace" font-size="36" font-weight="800">ZERO</text>
+    <text x="804" y="78" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="600">Frontend Slop</text>
+    <text x="804" y="96" fill="#8c8c8c" font-family="system-ui, sans-serif" font-size="12">Ant Design Dark Architecture</text>
+  </g>
+
+  <!-- Terminal Preview Footer Bar -->
+  <g transform="translate(80, 460)">
+    <rect x="0" y="0" width="1040" height="88" rx="10" fill="#000000" stroke="#262626" stroke-width="1"/>
+    <!-- Shell traffic dots -->
+    <circle cx="28" cy="44" r="5" fill="#ff4d4f"/>
+    <circle cx="44" cy="44" r="5" fill="#faad14"/>
+    <circle cx="60" cy="44" r="5" fill="#52c41a"/>
+
+    <text x="88" y="40" fill="#8c8c8c" font-family="ui-monospace, monospace" font-size="12">AUDIT TARGET</text>
+    <text x="88" y="62" fill="#1677ff" font-family="ui-monospace, monospace" font-size="15" font-weight="600">
+      securipulse --target https://production-api.app --profile rigorous --canary-injection
+    </text>
+
+    <!-- Status Tag on Right -->
+    <rect x="880" y="28" width="136" height="32" rx="6" fill="#111d2c" stroke="#153450" stroke-width="1"/>
+    <text x="898" y="49" fill="#1677ff" font-family="ui-monospace, monospace" font-size="12" font-weight="700">● 42/42 TESTED</text>
+  </g>
+</svg>
