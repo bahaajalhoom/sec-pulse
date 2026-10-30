@@ -6,10 +6,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   CodeOutlined,
-  CheckCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  ClockCircleOutlined,
   DeleteOutlined,
   VerticalAlignBottomOutlined,
   DownOutlined,
@@ -21,53 +17,56 @@ import { LiveTelemetryEvent, ProbeStatus } from '@/types/security';
 // ============================================================================
 // 2. CONFIGURATION & STYLES (ZONE 2)
 // ============================================================================
-const STATUS_BADGES: Record<
+const STATUS_META: Record<
   ProbeStatus,
-  { labelAr: string; labelEn: string; badgeClass: string; icon: React.ReactNode }
+  { labelAr: string; labelEn: string; colorClass: string; dotClass: string }
 > = {
   passed: {
     labelAr: 'تم الصد (آمن)',
     labelEn: 'DEFENDED',
-    badgeClass: 'bg-[#162312] text-[#52c41a] border border-[#274916]',
-    icon: <CheckCircleOutlined className="text-xs text-[#52c41a]" />,
+    colorClass: 'text-emerald-400',
+    dotClass: 'bg-emerald-400',
   },
   warning: {
     labelAr: 'تنبيه أمني',
     labelEn: 'WARNING',
-    badgeClass: 'bg-[#2b2111] text-[#faad14] border border-[#594214]',
-    icon: <WarningOutlined className="text-xs text-[#faad14]" />,
+    colorClass: 'text-amber-400',
+    dotClass: 'bg-amber-400',
   },
   failed: {
     labelAr: 'ثغرة مؤكدة',
     labelEn: 'VULNERABLE',
-    badgeClass: 'bg-[#2a1215] text-[#ff4d4f] border border-[#58181c]',
-    icon: <CloseCircleOutlined className="text-xs text-[#ff4d4f]" />,
+    colorClass: 'text-red-400',
+    dotClass: 'bg-red-400',
   },
   blocked: {
     labelAr: 'محظور من جدار الحماية',
-    labelEn: 'BLOCKED BY WAF',
-    badgeClass: 'bg-[#111d2c] text-[#1677ff] border border-[#153450]',
-    icon: <CheckCircleOutlined className="text-xs text-[#1677ff]" />,
+    labelEn: 'BLOCKED',
+    colorClass: 'text-zinc-400',
+    dotClass: 'bg-zinc-400',
   },
   running: {
     labelAr: 'جاري الإرسال...',
     labelEn: 'PROBING...',
-    badgeClass: 'bg-[#1f1f1f] text-[#d9d9d9] border border-[#303030]',
-    icon: <SyncOutlined spin className="text-xs text-[#1677ff]" />,
+    colorClass: 'text-white',
+    dotClass: 'bg-white',
   },
   pending: {
     labelAr: 'في الانتظار',
     labelEn: 'QUEUED',
-    badgeClass: 'bg-[#141414] text-[#595959] border border-[#303030]',
-    icon: <ClockCircleOutlined className="text-xs text-[#595959]" />,
+    colorClass: 'text-zinc-600',
+    dotClass: 'bg-zinc-600',
   },
 };
 
 const STYLES = {
-  consoleCard: 'rounded-[8px] border border-[#303030] bg-[#141414] flex flex-col overflow-hidden',
-  headerBar: 'px-4 py-2.5 bg-[#1f1f1f] border-b border-[#303030] flex items-center justify-between flex-wrap gap-2',
-  filterPill: 'px-2 py-0.5 rounded-[4px] text-[11px] font-mono transition-colors flex items-center gap-1 cursor-pointer border',
-  row: 'w-full text-start p-3 hover:bg-[#1f1f1f] transition-colors border-b border-[#262626] font-mono text-xs flex flex-col gap-1 cursor-pointer focus:outline-none focus-visible:bg-[#1f1f1f]',
+  consoleCard:
+    'rounded-xl border border-white/[0.08] bg-[#0c0c0e] overflow-hidden flex flex-col',
+  headerBar:
+    'flex items-center justify-between p-3 border-b border-white/[0.08] bg-black',
+  filterBtn:
+    'px-2.5 py-1 rounded text-xs transition-colors cursor-pointer select-none font-mono',
+  row: 'p-2.5 text-xs font-mono transition-colors border-b border-white/[0.04] hover:bg-white/[0.02] flex flex-col gap-1.5 w-full text-start cursor-pointer select-none',
 };
 
 // ============================================================================
@@ -97,7 +96,6 @@ export default function LiveTelemetryConsole({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll when new events arrive
   useEffect(() => {
     if (autoScroll && terminalEndRef.current) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -117,128 +115,104 @@ export default function LiveTelemetryConsole({
     <div className={STYLES.consoleCard}>
       {/* Console Top Toolbar */}
       <div className={STYLES.headerBar}>
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#ff4d4f]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#faad14]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#52c41a]" />
-          </div>
-          <div className="h-4 w-[1px] bg-[#303030] mx-1" />
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-white">
-            <CodeOutlined className="text-xs text-[#1677ff]" />
-            <span>
-              {isArabic
-                ? 'شاشة المراقبة الحية للهجوم والأكواد المُرسلة'
-                : 'Live Threat Execution & Telemetry Terminal'}
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <CodeOutlined className="text-xs text-zinc-400" />
+          <span className="text-xs font-medium text-white">
+            {isArabic ? 'سجل الرصد الحي للحزم' : 'Live Packet Telemetry'}
+          </span>
           {isRunning && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#111d2c] text-[#1677ff] border border-[#153450]">
-              LIVE
+            <span className="text-[10px] font-mono text-amber-400 flex items-center gap-1 ms-2">
+              <SyncOutlined spin className="text-[9px]" />
+              <span>STREAMING</span>
             </span>
           )}
         </div>
 
         {/* Toolbar Controls */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Status Filter Badges */}
-          <div className="flex items-center bg-[#141414] p-0.5 rounded-lg border border-[#303030] text-[11px]">
+        <div className="flex items-center gap-2">
+          {/* Filters */}
+          <div className="flex items-center gap-1 text-xs">
             <button
               type="button"
               onClick={() => setFilter('all')}
-              className={`${STYLES.filterPill} ${
+              className={`${STYLES.filterBtn} ${
                 filter === 'all'
-                  ? 'bg-[#1f1f1f] text-white border-[#303030]'
-                  : 'border-transparent text-[#8c8c8c] hover:text-white'
+                  ? 'bg-white/[0.1] text-white'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <span>{isArabic ? 'الكل' : 'All'}</span>
-              <span className="text-[10px] opacity-70 font-mono">({events.length})</span>
+              {isArabic ? 'الكل' : 'All'} ({events.length})
             </button>
             <button
               type="button"
               onClick={() => setFilter('failed')}
-              className={`${STYLES.filterPill} ${
+              className={`${STYLES.filterBtn} ${
                 filter === 'failed'
-                  ? 'bg-[#2a1215] text-[#ff4d4f] border-[#58181c]'
-                  : 'border-transparent text-[#8c8c8c] hover:text-[#ff4d4f]'
+                  ? 'bg-white/[0.1] text-red-400'
+                  : 'text-zinc-500 hover:text-red-400'
               }`}
             >
-              <span>{isArabic ? 'ثغرات' : 'Vulns'}</span>
-              <span className="text-[10px] opacity-70 font-mono">({failedCount})</span>
+              {isArabic ? 'ثغرات' : 'Vulns'} ({failedCount})
             </button>
             <button
               type="button"
               onClick={() => setFilter('warning')}
-              className={`${STYLES.filterPill} ${
+              className={`${STYLES.filterBtn} ${
                 filter === 'warning'
-                  ? 'bg-[#2b2111] text-[#faad14] border-[#594214]'
-                  : 'border-transparent text-[#8c8c8c] hover:text-[#faad14]'
+                  ? 'bg-white/[0.1] text-amber-400'
+                  : 'text-zinc-500 hover:text-amber-400'
               }`}
             >
-              <span>{isArabic ? 'تنبيهات' : 'Warn'}</span>
-              <span className="text-[10px] opacity-70 font-mono">({warningCount})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('passed')}
-              className={`${STYLES.filterPill} ${
-                filter === 'passed'
-                  ? 'bg-[#162312] text-[#52c41a] border-[#274916]'
-                  : 'border-transparent text-[#8c8c8c] hover:text-[#52c41a]'
-              }`}
-            >
-              <span>{isArabic ? 'سليم' : 'Safe'}</span>
-              <span className="text-[10px] opacity-70 font-mono">({passedCount})</span>
+              {isArabic ? 'تنبيهات' : 'Warn'} ({warningCount})
             </button>
           </div>
 
-          {/* Auto-scroll toggle */}
+          <div className="h-3.5 w-[1px] bg-white/[0.08] mx-1" />
+
+          {/* Autoscroll */}
           <button
             type="button"
             onClick={() => setAutoScroll(!autoScroll)}
-            className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
-              autoScroll
-                ? 'bg-[#111d2c] border-[#153450] text-[#1677ff]'
-                : 'bg-[#1f1f1f] border-[#303030] text-[#8c8c8c]'
+            className={`p-1 rounded text-xs transition-colors cursor-pointer ${
+              autoScroll ? 'text-white' : 'text-zinc-600'
             }`}
-            title={autoScroll ? 'Auto-scroll ON' : 'Auto-scroll OFF'}
+            title="Auto-scroll"
           >
-            <VerticalAlignBottomOutlined className="text-xs" />
+            <VerticalAlignBottomOutlined />
           </button>
 
-          {/* Clear Log */}
+          {/* Clear */}
           <button
             type="button"
             onClick={onClear}
             disabled={events.length === 0 || isRunning}
-            className="p-1.5 rounded-lg bg-[#1f1f1f] border border-[#303030] text-[#8c8c8c] hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
-            title={isArabic ? 'مسح السجل' : 'Clear Logs'}
+            className="p-1 rounded text-xs text-zinc-500 hover:text-white disabled:opacity-30 transition-colors cursor-pointer"
+            title="Clear logs"
           >
-            <DeleteOutlined className="text-xs" />
+            <DeleteOutlined />
           </button>
         </div>
       </div>
 
       {/* Terminal Output Area */}
-      <div className="max-h-[380px] min-h-[220px] overflow-y-auto divide-y divide-[#222] select-text">
+      <div className="max-h-[750px] min-h-[600px] overflow-y-auto select-text font-mono">
         {filteredEvents.length === 0 ? (
-          <div className="h-[220px] flex flex-col items-center justify-center text-center p-6 text-[#8c8c8c] font-mono text-xs">
-            <CodeOutlined className="text-2xl mb-2 opacity-30 text-[#1677ff]" />
-            <p>
+          <div className="h-[600px] flex flex-col items-center justify-center text-center p-8 text-zinc-600 font-mono text-xs">
+            <span className="text-zinc-700 text-sm mb-1">$ securipulse --listen</span>
+            <p className="text-zinc-400">
               {isArabic
-                ? 'لا توجد هجمات مُسجلة حالياً. اضغط "شن الهجوم وفحص الأمان" للبدء.'
-                : 'No telemetry logged. Launch the simulated audit to view live traffic.'}
+                ? 'محرك الرصد بانتظار بدء الفحص'
+                : 'Telemetry stream waiting for scan trigger...'}
             </p>
-            <span className="text-[11px] text-[#595959] mt-1">
+            <p className="text-[11px] text-zinc-600 mt-1 max-w-xs">
               {isArabic
-                ? 'ستظهر هنا كل استجابة، الكود المُرسل، والزمن المستغرق بالملي ثانية.'
-                : 'Live requests, sent payloads, and HTTP status codes will stream here.'}
-            </span>
+                ? 'اضغط "بدء فحص الأمان الشامل" لبدء إرسال الحزم ورؤية النتائج اللحظية هنا.'
+                : 'Click "Start Security Audit" to stream live packets, status codes, and latency.'}
+            </p>
           </div>
         ) : (
           filteredEvents.map((ev) => {
-            const badge = STATUS_BADGES[ev.status] || STATUS_BADGES.pending;
+            const meta = STATUS_META[ev.status] || STATUS_META.pending;
             const isExpanded = expandedId === ev.id;
 
             return (
@@ -248,74 +222,63 @@ export default function LiveTelemetryConsole({
                 onClick={() => setExpandedId(isExpanded ? null : ev.id)}
                 className={STYLES.row}
               >
-                {/* Single Event Summary Line */}
-                <div className="flex items-center justify-between gap-2 flex-wrap w-full">
+                {/* Event Summary Line */}
+                <div className="flex items-center justify-between gap-2 flex-wrap w-full text-zinc-400">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[#8c8c8c] text-[10px]">[{ev.timestamp}]</span>
-                    <span className="text-[10px] font-bold text-[#1677ff] bg-[#111d2c] px-1.5 py-0.2 rounded border border-[#153450]">
-                      T-{ev.threadId}
-                    </span>
-                    <span className="text-[10px] font-bold text-[#faad14] bg-[#2b2111] px-1.5 py-0.2 rounded border border-[#594214]">
-                      {ev.method}
-                    </span>
-                    <span className="text-[#d9d9d9] font-medium truncate max-w-[260px] sm:max-w-md">
+                    <span className="text-zinc-600 text-[10px]">{ev.timestamp}</span>
+                    <span className="text-zinc-500 text-[10px]">T{ev.threadId}</span>
+                    <span className="text-white text-[11px] font-semibold">{ev.method}</span>
+                    <span className="text-zinc-200 truncate max-w-[260px] sm:max-w-md">
                       {ev.url}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-[#8c8c8c] font-mono">
-                      {ev.latencyMs}ms
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#1f1f1f] text-[#d9d9d9] border border-[#303030]">
-                      {ev.statusCode}
-                    </span>
-                    <span
-                      className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded flex items-center gap-1 ${badge.badgeClass}`}
-                    >
-                      {badge.icon}
-                      <span>{isArabic ? badge.labelAr : badge.labelEn}</span>
-                    </span>
+                    <span className="text-zinc-500 text-[10px]">{ev.latencyMs}ms</span>
+                    <span className="text-zinc-300 text-[11px]">{ev.statusCode}</span>
+                    <div className="flex items-center gap-1.5 ms-1">
+                      <span className={`w-1.5 h-1.5 rounded-full ${meta.dotClass}`} />
+                      <span className={`text-[10px] uppercase font-mono ${meta.colorClass}`}>
+                        {isArabic ? meta.labelAr : meta.labelEn}
+                      </span>
+                    </div>
                     {isExpanded ? (
-                      <UpOutlined className="text-[10px] text-[#8c8c8c]" />
+                      <UpOutlined className="text-[9px] text-zinc-600" />
                     ) : (
-                      <DownOutlined className="text-[10px] text-[#8c8c8c]" />
+                      <DownOutlined className="text-[9px] text-zinc-600" />
                     )}
                   </div>
                 </div>
 
                 {/* Sent Payload Snippet */}
-                <div className="text-[11px] text-[#8c8c8c] flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap pl-1">
-                  <span className="text-[#1677ff] select-none">→</span>
-                  <span className="text-[#8c8c8c]">
-                    {isArabic ? 'الكود المُرسل:' : 'Payload:'}
-                  </span>
-                  <code className="text-[#91caff] bg-[#111d2c] px-1 rounded border border-[#153450]">
+                <div className="text-[11px] text-zinc-500 flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span className="text-zinc-700">→</span>
+                  <code className="text-zinc-300 bg-white/[0.04] px-1.5 py-0.2 rounded font-mono">
                     {ev.sentPayloadSnippet}
                   </code>
                 </div>
 
-                {/* Expanded Details Drawer */}
+                {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="mt-2.5 p-3 rounded-lg bg-[#141414] border border-[#303030] text-xs space-y-2 w-full text-start">
+                  <div className="mt-2 p-3 rounded-lg bg-black border border-white/[0.06] text-xs space-y-2 w-full text-start font-sans">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white">
+                      <span className="font-medium text-white">
                         {isArabic ? ev.probeNameAr : ev.probeName}
                       </span>
-                      <span className="text-[10px] uppercase font-mono text-[#8c8c8c]">
+                      <span className="text-[10px] uppercase font-mono text-zinc-500">
                         {ev.category}
                       </span>
                     </div>
 
-                    <p className="text-[#d9d9d9] text-[11px] leading-relaxed">
+                    <p className="text-zinc-400 text-[11px] leading-relaxed">
                       {isArabic ? ev.explanationAr : ev.explanation}
                     </p>
 
-                    <div className="bg-[#0c0c0c] p-2.5 rounded border border-[#262626] space-y-1">
-                      <span className="text-[10px] text-[#8c8c8c] block">
-                        {isArabic ? '// الدليل والرد المستلم:' : '// Evidence & Result:'}
+                    <div className="bg-[#0c0c0e] p-2.5 rounded border border-white/[0.06] space-y-1 font-mono text-[11px]">
+                      <span className="text-zinc-500 block text-[10px]">
+                        {isArabic ? '// الدليل والاستجابة:' : '// Response Evidence:'}
                       </span>
-                      <code className="text-[#52c41a] text-[11px] block whitespace-pre-wrap">
+                      <code className="text-emerald-400 block whitespace-pre-wrap">
                         {ev.evidence}
                       </code>
                     </div>
@@ -328,21 +291,21 @@ export default function LiveTelemetryConsole({
         <div ref={terminalEndRef} />
       </div>
 
-      {/* Terminal Footer Bar */}
-      <div className="px-4 py-2 bg-[#1f1f1f] border-t border-[#303030] flex items-center justify-between text-[11px] font-mono text-[#8c8c8c]">
+      {/* Terminal Footer */}
+      <div className="px-4 py-2 bg-black border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-zinc-500">
         <span>
-          {isArabic ? 'إجمالي الطلبات المُنفذة:' : 'Probes Telemetry:'}{' '}
+          {isArabic ? 'إجمالي الطلبات:' : 'Probes:'}{' '}
           <strong className="text-white">{events.length}</strong>
         </span>
         <div className="flex items-center gap-3">
-          <span className="text-[#52c41a]">
-            {passedCount} {isArabic ? 'تم الصد' : 'Defended'}
+          <span className="text-emerald-400">
+            {passedCount} {isArabic ? 'سليم' : 'passed'}
           </span>
-          <span className="text-[#faad14]">
-            {warningCount} {isArabic ? 'تنبيه' : 'Warnings'}
+          <span className="text-amber-400">
+            {warningCount} {isArabic ? 'تنبيه' : 'warnings'}
           </span>
-          <span className="text-[#ff4d4f]">
-            {failedCount} {isArabic ? 'ثغرات' : 'Vulnerable'}
+          <span className="text-red-400">
+            {failedCount} {isArabic ? 'ثغرة' : 'vulns'}
           </span>
         </div>
       </div>

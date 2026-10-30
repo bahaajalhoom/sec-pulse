@@ -5,17 +5,13 @@
 // ============================================================================
 import React, { useState } from 'react';
 import {
-  ApiOutlined,
   SearchOutlined,
   LinkOutlined,
   PlusOutlined,
   DeleteOutlined,
-  CheckCircleOutlined,
-  InfoCircleOutlined,
   DownOutlined,
   UpOutlined,
-  ThunderboltOutlined,
-  DatabaseOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 import { DiscoveredEndpoint, EndpointDiscoveryResult, ApiArchitecture } from '@/types/security';
 
@@ -23,13 +19,11 @@ import { DiscoveredEndpoint, EndpointDiscoveryResult, ApiArchitecture } from '@/
 // 2. CONFIGURATION & STYLES (ZONE 2)
 // ============================================================================
 const STYLES = {
-  card: 'rounded-[8px] border border-[#303030] bg-[#141414] p-4 sm:p-5 space-y-4',
+  card: 'space-y-3.5',
   input:
-    'w-full rounded-[6px] border border-[#303030] bg-[#1f1f1f] px-3.5 py-2 text-xs text-white placeholder-[#595959] focus:border-[#1677ff] focus:outline-none font-mono transition-colors',
-  methodPill:
-    'px-2 py-0.5 rounded-[4px] font-mono text-[10px] font-bold uppercase border',
+    'w-full rounded-lg border border-white/[0.08] bg-black px-3.5 py-2 text-xs text-white placeholder-zinc-600 focus:border-white/30 focus:outline-none font-mono transition-colors',
   discoverBtn:
-    'px-3.5 py-2 rounded-[6px] font-medium text-xs text-white bg-[#1677ff] hover:bg-[#4096ff] transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50',
+    'px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.12] transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-40',
 };
 
 // ============================================================================
@@ -93,8 +87,8 @@ export default function EndpointDiscoveryPanel({
             crawledScripts: res.crawledScriptsCount,
             discoveredCount: res.endpoints.length,
             apiBaseUrl: res.detectedApiBaseUrl,
-            messageAr: `تم كشف معمارية Supabase سحابية (BaaS) للموقع! تم رصد خادم قواعد البيانات (${res.detectedApiBaseUrl}) واستخراج جداول البيانات والمسارات الحقيقية (${res.endpoints.length}) لفحص أمان الجداول (RLS) وحماية البيانات الحساسة.`,
-            messageEn: `Detected Supabase Backend-as-a-Service (BaaS) architecture! Connected to database (${res.detectedApiBaseUrl}) and extracted ${res.endpoints.length} data tables and routes for Row-Level Security auditing.`,
+            messageAr: `تم كشف معمارية Supabase BaaS (${res.detectedApiBaseUrl}) واستخراج ${res.endpoints.length} مسار لفحص أمان الجداول والصلاحيات.`,
+            messageEn: `Detected Supabase BaaS architecture (${res.detectedApiBaseUrl}) with ${res.endpoints.length} tables staged.`,
           });
         } else if (res.apiArchitecture === 'co_located_serverless') {
           const resolvedApi = res.detectedApiBaseUrl || targetUrl;
@@ -104,8 +98,8 @@ export default function EndpointDiscoveryPanel({
             crawledScripts: res.crawledScriptsCount,
             discoveredCount: res.endpoints.length,
             apiBaseUrl: resolvedApi,
-            messageAr: `تم اكتشاف معمارية مدمجة عند الطلب (Next.js / On-Demand Serverless Routes) على نفس الموقع! تم رصد (${res.endpoints.length}) مساراً برمجياً جاهزاً للاختبار ومحاكاة الطلبات.`,
-            messageEn: `Detected Co-located Serverless Architecture (Next.js / On-Demand Routes) on same host. Staged ${res.endpoints.length} endpoints for testing.`,
+            messageAr: `تم رصد مسارات API مدمجة على نفس النطاق (${res.endpoints.length} مسار).`,
+            messageEn: `Detected serverless/co-located endpoints (${res.endpoints.length} routes).`,
           });
         } else if (res.apiArchitecture === 'external_backend' && res.detectedApiBaseUrl) {
           onApiBaseUrlChange(res.detectedApiBaseUrl);
@@ -114,18 +108,17 @@ export default function EndpointDiscoveryPanel({
             crawledScripts: res.crawledScriptsCount,
             discoveredCount: res.endpoints.length,
             apiBaseUrl: res.detectedApiBaseUrl,
-            messageAr: `تم التحقق بنجاح! تم رصد خادم API خارجي مستقل (${res.detectedApiBaseUrl}) واكتشاف (${res.endpoints.length}) مسار.`,
-            messageEn: `Verified! Active external API server detected (${res.detectedApiBaseUrl}) with ${res.endpoints.length} endpoints.`,
+            messageAr: `تم رصد خادم API مستقل (${res.detectedApiBaseUrl}) واكتشاف ${res.endpoints.length} مسار.`,
+            messageEn: `External API host detected (${res.detectedApiBaseUrl}) with ${res.endpoints.length} routes.`,
           });
         } else {
-          // Frontend only
           onApiBaseUrlChange('');
           setDiscoveryStatus({
             architecture: 'frontend_only',
             crawledScripts: res.crawledScriptsCount,
             discoveredCount: res.endpoints.length,
-            messageAr: `الموقع يعمل كواجهة أمامية مباشرة (بدون مسارات API مكتشفة). سيتم تركيز الفحص على ترويسات الأمان وملفات التكوين الحساسة وسياسات CORS وعزل النطاق.`,
-            messageEn: `Pure frontend without detected API endpoints. Audit will focus on security headers, .env files, and CORS isolation.`,
+            messageAr: `واجهة أمامية مباشرة بدون مسارات API واضحة في الكود المصدري.`,
+            messageEn: `Static frontend detected without explicit public endpoints.`,
           });
         }
 
@@ -161,7 +154,7 @@ export default function EndpointDiscoveryPanel({
       source: 'user_defined',
       tested: false,
       selected: true,
-      description: 'Custom developer endpoint',
+      description: 'Custom endpoint',
     };
 
     onEndpointsChange([newEp, ...endpoints]);
@@ -180,30 +173,11 @@ export default function EndpointDiscoveryPanel({
 
   return (
     <div className={STYLES.card}>
-      {/* Top Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#111d2c] border border-[#153450] flex items-center justify-center text-[#1677ff]">
-            <ApiOutlined className="text-sm" />
-          </div>
-          <div>
-            <h3 className="text-xs font-bold text-white flex items-center gap-2">
-              <span>
-                {isArabic
-                  ? 'مُستكشف مسارات الـ API والنهايات الحقيقية'
-                  : 'Automated API & Endpoint Discovery Engine'}
-              </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#1f1f1f] text-[#8c8c8c] border border-[#303030]">
-                {endpoints.length} {isArabic ? 'مسار' : 'routes'}
-              </span>
-            </h3>
-            <p className="text-[11px] text-[#8c8c8c]">
-              {isArabic
-                ? 'يفحص كود الجافاسكريبت الفعلي ويتحقق هل يوجد خادم API حقيقي يعمل على النطاق'
-                : 'Scans real JavaScript bundles and verifies if an active backend API exists on target'}
-            </p>
-          </div>
-        </div>
+      {/* Top Action Header */}
+      <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+        <span className="text-xs text-zinc-400">
+          {isArabic ? 'فحص ملفات الـ JS لاكتشاف نهايات الـ API' : 'Scan JS bundles for API routes'}
+        </span>
 
         <div className="flex items-center gap-2">
           <button
@@ -216,18 +190,18 @@ export default function EndpointDiscoveryPanel({
             <span>
               {isDiscovering
                 ? isArabic
-                  ? 'جاري فحص ملفات الـ JS...'
-                  : 'Scanning Bundles...'
+                  ? 'جاري الفحص...'
+                  : 'Scanning...'
                 : isArabic
-                ? 'استكشاف الـ API تلقائياً'
-                : 'Auto-Discover Endpoints'}
+                ? 'استكشاف المسارات'
+                : 'Discover Routes'}
             </span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-lg bg-[#1f1f1f] hover:bg-[#262626] text-[#8c8c8c] hover:text-white border border-[#303030] transition-colors cursor-pointer"
+            className="p-1 rounded text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
             {isExpanded ? <UpOutlined className="text-xs" /> : <DownOutlined className="text-xs" />}
           </button>
@@ -236,70 +210,32 @@ export default function EndpointDiscoveryPanel({
 
       {/* Discovery Status Notice */}
       {discoveryStatus && (
-        <div
-          className={`p-3 rounded-lg border text-xs flex flex-col gap-2 ${
-            discoveryStatus.architecture === 'supabase_baas'
-              ? 'bg-[#162312] border-[#274916] text-[#b7eb8f]'
-              : discoveryStatus.architecture === 'co_located_serverless'
-              ? 'bg-[#111d2c] border-[#153450] text-[#91caff]'
-              : discoveryStatus.architecture === 'external_backend'
-              ? 'bg-[#111d2c] border-[#153450] text-[#91caff]'
-              : 'bg-[#1f1f1f] border-[#303030] text-[#d9d9d9]'
-          }`}
-        >
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              {discoveryStatus.architecture === 'supabase_baas' ? (
-                <DatabaseOutlined className="text-[#52c41a]" />
-              ) : (
-                <ThunderboltOutlined className="text-[#1677ff]" />
-              )}
-              <span className="font-semibold text-[11px] px-2 py-0.5 rounded border bg-black/40 border-current">
-                {discoveryStatus.architecture === 'supabase_baas'
-                  ? isArabic
-                    ? 'قواعد بيانات سحابية (Supabase BaaS)'
-                    : 'Supabase Cloud BaaS'
-                  : discoveryStatus.architecture === 'co_located_serverless'
-                  ? isArabic
-                    ? 'مسارات API مدمجة عند الطلب (Serverless / Next.js)'
-                    : 'On-Demand Serverless / Next.js API'
-                  : discoveryStatus.architecture === 'external_backend'
-                  ? isArabic
-                    ? 'خادم API مستقل ومخصص'
-                    : 'Dedicated External API Server'
-                  : isArabic
-                  ? 'واجهة أمامية مباشرة'
-                  : 'Pure Frontend'}
-              </span>
-            </div>
-            <span className="text-[10px] font-mono opacity-80">
-              {isArabic
-                ? `تم فحص (${discoveryStatus.crawledScripts}) ملف جافاسكريبت`
-                : `Analyzed ${discoveryStatus.crawledScripts} JS bundles`}
+        <div className="p-3 rounded-lg bg-black border border-white/[0.08] text-xs flex flex-col gap-1.5 font-mono">
+          <div className="flex items-center justify-between">
+            <span className="text-emerald-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>{discoveryStatus.architecture}</span>
+            </span>
+            <span className="text-zinc-500 text-[10px]">
+              {discoveryStatus.crawledScripts} bundles
             </span>
           </div>
-
-          <p className="leading-relaxed text-[11.5px] opacity-90">
+          <p className="text-zinc-300 text-[11px] font-sans">
             {isArabic ? discoveryStatus.messageAr : discoveryStatus.messageEn}
           </p>
         </div>
       )}
 
       {/* API Base URL Setting Field */}
-      <div className="space-y-1.5 pt-1">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-medium text-[#d9d9d9] flex items-center gap-1.5">
-            <LinkOutlined className="text-xs text-[#1677ff]" />
-            <span>
-              {isArabic
-                ? 'رابط خادم الـ API (اتركه فارغاً إذا كان موقعك واجهة بدون API):'
-                : 'API Base URL (leave empty if site is a static/pure frontend):'}
-            </span>
-          </label>
-          <span className="text-[10px] text-[#8c8c8c] font-mono">
-            {isArabic ? 'مثال: https://api.mysite.com' : 'Optional custom backend'}
+      <div className="space-y-1">
+        <label className="text-[11px] text-zinc-400 flex items-center gap-1.5">
+          <LinkOutlined className="text-xs text-zinc-500" />
+          <span>
+            {isArabic
+              ? 'خادم الـ API المخصص (اختياري):'
+              : 'Custom API Base Host (Optional):'}
           </span>
-        </div>
+        </label>
         <input
           type="text"
           value={apiBaseUrl}
@@ -313,14 +249,14 @@ export default function EndpointDiscoveryPanel({
 
       {/* Expanded Endpoints List & Custom Endpoint Input */}
       {isExpanded && (
-        <div className="space-y-3 pt-2 border-t border-[#303030]">
+        <div className="space-y-3 pt-2 border-t border-white/[0.06]">
           {/* Add Custom Endpoint Form */}
-          <form onSubmit={handleAddCustomEndpoint} className="flex items-center gap-2">
+          <form onSubmit={handleAddCustomEndpoint} className="flex items-center gap-1.5">
             <select
               value={newMethod}
               onChange={(e) => setNewMethod(e.target.value as 'GET' | 'POST')}
               disabled={isRunning}
-              className="px-2.5 py-2 rounded-[6px] bg-[#1f1f1f] border border-[#303030] text-xs text-white font-mono focus:border-[#1677ff] focus:outline-none cursor-pointer"
+              className="px-2 py-2 rounded-lg bg-black border border-white/[0.08] text-xs text-white font-mono focus:outline-none cursor-pointer"
             >
               <option value="GET">GET</option>
               <option value="POST">POST</option>
@@ -337,106 +273,86 @@ export default function EndpointDiscoveryPanel({
             <button
               type="submit"
               disabled={isRunning || !newPath.trim()}
-              className="px-3.5 py-2 rounded-[6px] bg-[#1f1f1f] hover:bg-[#262626] text-xs font-medium text-white border border-[#303030] flex items-center gap-1 transition-colors cursor-pointer shrink-0 disabled:opacity-40"
+              className="px-3 py-2 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] text-xs font-medium text-white border border-white/[0.1] transition-colors cursor-pointer shrink-0 disabled:opacity-30"
             >
               <PlusOutlined className="text-xs" />
-              <span>{isArabic ? 'إضافة مسار' : 'Add Path'}</span>
             </button>
           </form>
 
           {/* Endpoints Table Actions */}
           {endpoints.length > 0 && (
-            <div className="flex items-center justify-between text-[11px] text-[#8c8c8c] px-1">
+            <div className="flex items-center justify-between text-[11px] text-zinc-500">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => handleSelectAll(true)}
-                  className="hover:text-[#1677ff] transition-colors cursor-pointer"
+                  className="hover:text-white transition-colors cursor-pointer"
                 >
-                  {isArabic ? 'تحديد الكل' : 'Select All'}
+                  {isArabic ? 'تحديد الكل' : 'Select all'}
                 </button>
-                <span>•</span>
+                <span>·</span>
                 <button
                   type="button"
                   onClick={() => handleSelectAll(false)}
                   className="hover:text-white transition-colors cursor-pointer"
                 >
-                  {isArabic ? 'إلغاء التحديد' : 'Deselect All'}
+                  {isArabic ? 'إلغاء' : 'Clear'}
                 </button>
               </div>
               <span className="font-mono">
-                {selectedCount} / {endpoints.length} {isArabic ? 'مشمول بالفحص' : 'selected'}
+                {selectedCount} / {endpoints.length}
               </span>
             </div>
           )}
 
           {/* Endpoints Scroll List */}
-          <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1 divide-y divide-[#222]">
+          <div className="max-h-56 overflow-y-auto space-y-1 pr-1 font-mono text-xs">
             {endpoints.length === 0 ? (
-              <div className="p-4 text-center text-xs text-[#8c8c8c] font-mono">
-                {isArabic
-                  ? 'لا توجد نهايات API مسجلة حالياً. إذا كان لديك مسارات تريد اختبارها، يمكنك إضافتها يدوياً أعلاه.'
-                  : 'No custom API endpoints queued. Add custom paths above if you have private APIs to test.'}
+              <div className="p-3 text-center text-zinc-600 font-mono text-xs">
+                {isArabic ? 'لا توجد مسارات مضافة بعد' : 'No endpoints registered yet'}
               </div>
             ) : (
-              endpoints.map((ep) => {
-                const methodColor =
-                  ep.method === 'POST'
-                    ? 'bg-[#111d2c] text-[#1677ff] border-[#153450]'
-                    : 'bg-[#162312] text-[#52c41a] border-[#274916]';
-
-                return (
-                  <div
-                    key={ep.id}
-                    className="p-2 rounded-lg bg-[#181818] hover:bg-[#202020] border border-[#2a2a2a] flex items-center justify-between gap-2 text-xs font-mono transition-colors"
+              endpoints.map((ep) => (
+                <div
+                  key={ep.id}
+                  className="flex items-center justify-between p-2 rounded bg-black border border-white/[0.04] hover:border-white/[0.08] transition-colors"
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleToggleEndpoint(ep.id)}
+                    className="flex items-center gap-2 text-start flex-1 min-w-0 cursor-pointer"
                   >
-                    <div className="flex items-center gap-2.5 truncate">
-                      <input
-                        type="checkbox"
-                        checked={ep.selected}
-                        onChange={() => handleToggleEndpoint(ep.id)}
-                        disabled={isRunning}
-                        className="w-3.5 h-3.5 rounded border-[#303030] bg-[#141414] text-[#1677ff] focus:ring-0 cursor-pointer"
-                      />
-                      <span className={`${STYLES.methodPill} ${methodColor}`}>
-                        {ep.method}
-                      </span>
-                      <span className="text-[#ededed] truncate" dir="ltr">
-                        {ep.path}
-                      </span>
+                    <div
+                      className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center shrink-0 ${
+                        ep.selected
+                          ? 'bg-white border-white text-black'
+                          : 'border-zinc-700 bg-transparent'
+                      }`}
+                    >
+                      {ep.selected && <CheckOutlined className="text-[8px] font-bold" />}
                     </div>
+                    <span
+                      className={`text-[10px] font-bold ${
+                        ep.method === 'POST' ? 'text-blue-400' : 'text-emerald-400'
+                      }`}
+                    >
+                      {ep.method}
+                    </span>
+                    <span className="truncate text-zinc-300" dir="ltr">
+                      {ep.path}
+                    </span>
+                  </button>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded border ${
-                          ep.source === 'supabase_table'
-                            ? 'bg-[#162312] text-[#52c41a] border-[#274916]'
-                            : 'bg-[#1f1f1f] text-[#8c8c8c] border-[#303030]'
-                        }`}
-                      >
-                        {ep.source === 'supabase_table'
-                          ? isArabic
-                            ? 'قاعدة Supabase'
-                            : 'Supabase DB'
-                          : ep.source === 'js_bundle'
-                          ? isArabic
-                            ? 'كود JS'
-                            : 'JS Code'
-                          : isArabic
-                          ? 'مسار مخصص'
-                          : 'Custom'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteEndpoint(ep.id)}
-                        className="text-[#8c8c8c] hover:text-[#ff4d4f] p-1 cursor-pointer transition-colors"
-                      >
-                        <DeleteOutlined className="text-xs" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteEndpoint(ep.id)}
+                    className="text-zinc-600 hover:text-red-400 p-1 transition-colors cursor-pointer"
+                    title="Delete endpoint"
+                  >
+                    <DeleteOutlined className="text-xs" />
+                  </button>
+                </div>
+              ))
             )}
           </div>
         </div>

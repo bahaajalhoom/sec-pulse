@@ -7,7 +7,6 @@ export interface BrandLogoProps {
   size?: 'sm' | 'md' | 'lg';
   lang?: 'ar' | 'en';
   className?: string;
-  showBadge?: boolean;
 }
 
 export default function BrandLogo({
@@ -15,16 +14,13 @@ export default function BrandLogo({
   size = 'md',
   lang = 'ar',
   className = '',
-  showBadge = true,
 }: BrandLogoProps) {
-  // Dimension tokens based on standard sizes
   const dimensions = {
-    sm: { icon: 24, text: 'text-xs', badge: 'text-[9px] px-1 py-0.2' },
-    md: { icon: 32, text: 'text-sm', badge: 'text-[10px] px-1.5 py-0.2' },
-    lg: { icon: 44, text: 'text-base', badge: 'text-[11px] px-2 py-0.5' },
+    sm: { icon: 20, text: 'text-xs' },
+    md: { icon: 24, text: 'text-sm' },
+    lg: { icon: 32, text: 'text-base' },
   }[size];
 
-  // Core Vector Shield + Telemetry Pulse Mark
   const MarkSvg = (
     <svg
       viewBox="0 0 256 256"
@@ -32,14 +28,14 @@ export default function BrandLogo({
       height={dimensions.icon}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="shrink-0 drop-shadow-sm select-none"
+      className="shrink-0 select-none"
       aria-hidden="true"
     >
-      <title>SecuriPulse Brandmark</title>
-      {/* Outer Defensive Shield Perimeter */}
+      <title>SecuriPulse</title>
+      {/* Outer Defensive Shield */}
       <path
         d="M128 24 L48 54 V126 C48 180 82 226 128 238 C174 226 208 180 208 126 V54 Z"
-        stroke="#1677ff"
+        stroke="#ffffff"
         strokeWidth="18"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -47,20 +43,19 @@ export default function BrandLogo({
       {/* Inner Telemetry Pulse Wave */}
       <path
         d="M64 128 H96 L112 156 L128 72 L144 156 L160 128 H192"
-        stroke="#13c2c2"
+        stroke="#a1a1aa"
         strokeWidth="18"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Central Telemetry Apex Node */}
-      <circle cx="128" cy="72" r="5" fill="#13c2c2" />
+      <circle cx="128" cy="72" r="5" fill="#ffffff" />
     </svg>
   );
 
   if (variant === 'mark' || variant === 'icon') {
     return (
       <div
-        className={`inline-flex items-center justify-center rounded-lg bg-[#111d2c] border border-[#153450] p-1.5 ${className}`}
+        className={`inline-flex items-center justify-center rounded-md bg-white/[0.04] border border-white/[0.08] p-1.5 ${className}`}
       >
         {MarkSvg}
       </div>
@@ -70,35 +65,21 @@ export default function BrandLogo({
   const isArabic = lang === 'ar';
 
   return (
-    <div className={`flex items-center gap-3 select-none ${className}`}>
-      <div className="rounded-lg bg-[#111d2c] border border-[#153450] p-1.5 flex items-center justify-center">
+    <div className={`flex items-center gap-2.5 select-none ${className}`}>
+      <div className="rounded-md bg-white/[0.04] border border-white/[0.08] p-1.5 flex items-center justify-center">
         {MarkSvg}
       </div>
       <div>
         <div className="flex items-center gap-2">
-          <span className={`font-bold tracking-tight text-white ${dimensions.text}`}>
-            {isArabic ? (
-              <span>
-                سيكيوري<span className="text-[#1677ff]">بلس</span>
-              </span>
-            ) : (
-              <span>
-                Securi<span className="text-[#1677ff]">Pulse</span>
-              </span>
-            )}
+          <span className={`font-semibold tracking-tight text-white ${dimensions.text}`}>
+            {isArabic ? 'سيكيوريبلس' : 'SecuriPulse'}
           </span>
-          {showBadge && (
-            <span
-              className={`font-mono font-medium rounded bg-[#1f1f1f] text-[#8c8c8c] border border-[#303030] ${dimensions.badge}`}
-            >
-              DEVSEC 2026
-            </span>
-          )}
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
         </div>
-        <p className="text-[11px] text-[#8c8c8c] hidden sm:block">
+        <p className="text-[11px] text-zinc-500 hidden sm:block">
           {isArabic
-            ? 'منصة محاكاة الهجمات الأمنية وفحص الثغرات للمواقع'
-            : 'Enterprise Threat Simulation & Vulnerability Auditor'}
+            ? 'فحص ثغرات الواجهات ومحاكاة الهجمات السيبرانية'
+            : 'Vulnerability Auditor & Threat Simulator'}
         </p>
       </div>
     </div>

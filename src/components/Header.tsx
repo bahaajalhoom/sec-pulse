@@ -6,26 +6,13 @@
 import React from 'react';
 import BrandLogo from './BrandLogo';
 import {
-  SafetyCertificateOutlined,
   BookOutlined,
   GlobalOutlined,
-  CheckCircleOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 
 // ============================================================================
-// 2. CONFIGURATION & CONSTANTS (ZONE 2)
-// ============================================================================
-const HEADER_CONFIG = {
-  title: 'SecuriPulse',
-  titleAr: 'سيكيوريبلس',
-  tagline: 'Enterprise Threat Simulation & Vulnerability Auditor',
-  taglineAr: 'منصة محاكاة الهجمات الأمنية وفحص الثغرات للمواقع',
-  badgeText: 'DEVSEC 2026',
-};
-
-// ============================================================================
-// 3. TYPES & INTERFACES (ZONE 3)
+// 2. TYPES & INTERFACES (ZONE 3)
 // ============================================================================
 interface HeaderProps {
   lang: 'ar' | 'en';
@@ -48,28 +35,28 @@ export default function Header({
   const isArabic = lang === 'ar';
 
   return (
-    <header className="border-b border-[#303030] bg-[#141414] sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <header className="border-b border-white/[0.08] bg-black sticky top-0 z-40">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
         {/* Brand Identity */}
-        <BrandLogo lang={lang} size="md" />
+        <BrandLogo lang={lang} size="sm" />
 
-        {/* Live Status & Quick Action Tools */}
-        <div className="flex items-center gap-2.5">
-          {/* Running Status Pill */}
+        {/* Action Tools */}
+        <div className="flex items-center gap-2">
+          {/* Running Status Indicator */}
           {isRunning && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2b2111] border border-[#594214] text-[#faad14] text-xs font-medium">
-              <SyncOutlined spin className="text-xs" />
-              <span>{isArabic ? 'جاري الفحص المباشر...' : 'Audit in Progress...'}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono">
+              <SyncOutlined spin className="text-[11px]" />
+              <span>{isArabic ? 'جاري الفحص المباشر...' : 'Auditing...'}</span>
             </div>
           )}
 
-          {/* Overall Score Badge if finished */}
+          {/* Overall Score if completed */}
           {score !== null && !isRunning && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1f1f1f] border border-[#303030] text-xs">
-              <span className="text-[#8c8c8c]">{isArabic ? 'تقييم الأمان:' : 'Score:'}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/[0.04] border border-white/[0.08] text-xs font-mono">
+              <span className="text-zinc-500">{isArabic ? 'التقييم:' : 'Score:'}</span>
               <span
-                className={`font-mono font-bold ${
-                  score >= 80 ? 'text-[#52c41a]' : score >= 60 ? 'text-[#faad14]' : 'text-[#ff4d4f]'
+                className={`font-bold ${
+                  score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-red-400'
                 }`}
               >
                 {score}/100
@@ -81,22 +68,23 @@ export default function Header({
           <button
             type="button"
             onClick={onOpenRecipes}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1f1f1f] hover:bg-[#262626] text-[#d9d9d9] border border-[#303030] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-colors cursor-pointer"
           >
-            <BookOutlined className="text-xs text-[#1677ff]" />
+            <BookOutlined className="text-xs" />
             <span className="hidden sm:inline">
-              {isArabic ? 'أكواد الحماية الفورية' : 'Defense Recipes'}
+              {isArabic ? 'أكواد الحماية' : 'Defense Recipes'}
             </span>
           </button>
 
-          {/* Language Toggle */}
+          {/* Language Switcher */}
           <button
             type="button"
             onClick={onToggleLang}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold bg-[#1f1f1f] hover:bg-[#262626] text-[#d9d9d9] border border-[#303030] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-white bg-transparent hover:bg-white/[0.04] transition-colors cursor-pointer"
+            title={isArabic ? 'Switch to English' : 'التحويل للعربية'}
           >
-            <GlobalOutlined className="text-xs text-[#8c8c8c]" />
-            <span>{isArabic ? 'English' : 'العربية'}</span>
+            <GlobalOutlined className="text-xs" />
+            <span className="font-mono uppercase">{lang}</span>
           </button>
         </div>
       </div>

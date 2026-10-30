@@ -3,7 +3,7 @@
 // ============================================================================
 // 1. IMPORTS
 // ============================================================================
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Header from '@/components/Header';
 import TargetConfig from '@/components/TargetConfig';
 import PayloadInspectorModal from '@/components/PayloadInspectorModal';
@@ -21,7 +21,6 @@ import {
 import { INITIAL_PROBES } from '@/lib/constants';
 import { normalizeTargetUrl } from '@/lib/security-engine';
 import {
-  DashboardOutlined,
   CodeOutlined,
   SafetyCertificateOutlined,
   SyncOutlined,
@@ -56,7 +55,7 @@ const DEFAULT_CATEGORIES: Record<VulnerabilityCategory, boolean> = {
   mass_assignment: true,
 };
 
-type ActiveViewTab = 'cockpit' | 'telemetry' | 'report';
+type RightPaneView = 'telemetry' | 'report';
 
 // ============================================================================
 // 6. MAIN COMPONENT (ZONE 6)
@@ -65,7 +64,7 @@ export default function HomePage() {
   // --- UI & Language State ---
   const [lang, setLang] = useState<'ar' | 'en'>('ar');
   const isArabic = lang === 'ar';
-  const [activeTab, setActiveTab] = useState<ActiveViewTab>('cockpit');
+  const [rightView, setRightView] = useState<RightPaneView>('telemetry');
 
   // --- Configuration State ---
   const [targetUrl, setTargetUrl] = useState(DEFAULT_CONFIG.initialTargetUrl);
@@ -76,7 +75,7 @@ export default function HomePage() {
   const [delayMs, setDelayMs] = useState(DEFAULT_CONFIG.defaultDelayMs);
   const [enabledCategories, setEnabledCategories] = useState(DEFAULT_CATEGORIES);
 
-  // --- Probes Catalog (Editable in Inspector) ---
+  // --- Probes Catalog ---
   const [probes, setProbes] = useState<SecurityProbePayload[]>(INITIAL_PROBES);
 
   // --- Modals State ---
@@ -108,7 +107,7 @@ export default function HomePage() {
     setLang((prev) => (prev === 'ar' ? 'en' : 'ar'));
   }
 
-  // --- Handlers: REAL Live Network Audit Execution ---
+  // --- Handlers: Live Audit Execution ---
   const handleStartAudit = useCallback(async () => {
     const cleanUrl = normalizeTargetUrl(targetUrl);
     setTargetUrl(cleanUrl);
@@ -126,7 +125,7 @@ export default function HomePage() {
     setIsRunning(true);
     setTelemetryEvents([]);
     setAuditReport(null);
-    setActiveTab('telemetry'); // Switch to live telemetry automatically
+    setRightView('telemetry');
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
@@ -175,8 +174,7 @@ export default function HomePage() {
                 setTelemetryEvents((prev) => [...prev, payload.event]);
               } else if (payload.type === 'report' && payload.report) {
                 setAuditReport(payload.report);
-                // When report completes, switch smoothly to report view
-                setActiveTab('report');
+                setRightView('report');
               }
             } catch {
               // Ignore malformed chunks
@@ -221,7 +219,7 @@ export default function HomePage() {
 
   return (
     <div
-      className={`min-h-screen bg-[#08090d] text-[#d9d9d9] flex flex-col font-sans selection:bg-[#1677ff] selection:text-white ${
+      className={`min-h-screen bg-black text-zinc-200 flex flex-col font-sans selection:bg-white selection:text-black ${
         isArabic ? 'rtl' : 'ltr'
       }`}
       dir={isArabic ? 'rtl' : 'ltr'}
@@ -235,139 +233,140 @@ export default function HomePage() {
         score={auditReport ? auditReport.score : null}
       />
 
-      {/* 2. Main Work Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
-        {/* Navigation Tabs Bar (Cockpit / Live Telemetry / Report) */}
-        <div className="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-[#262626]">
-          <div className="flex items-center gap-1.5 bg-[#141414] p-1 rounded-xl border border-[#303030]">
-            {/* Tab 1: Cockpit */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('cockpit')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'cockpit'
-                  ? 'bg-[#1677ff] text-white shadow-sm'
-                  : 'text-[#8c8c8c] hover:text-white'
-              }`}
-            >
-              <DashboardOutlined className="text-xs" />
-              <span>{isArabic ? 'لوحة التحكم والمسارات' : 'Attack Cockpit'}</span>
-            </button>
-
-            {/* Tab 2: Live Telemetry */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('telemetry')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'telemetry'
-                  ? 'bg-[#1677ff] text-white shadow-sm'
-                  : 'text-[#8c8c8c] hover:text-white'
-              }`}
-            >
-              {isRunning ? (
-                <SyncOutlined spin className="text-xs text-[#faad14]" />
-              ) : (
-                <CodeOutlined className="text-xs" />
-              )}
-              <span>{isArabic ? 'شاشة البث المباشر' : 'Live Stream'}</span>
-              {telemetryEvents.length > 0 && (
-                <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-black/40 text-current">
-                  {telemetryEvents.length}
-                </span>
-              )}
-            </button>
-
-            {/* Tab 3: Report & Remediation */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('report')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'report'
-                  ? 'bg-[#1677ff] text-white shadow-sm'
-                  : 'text-[#8c8c8c] hover:text-white'
-              }`}
-            >
-              <SafetyCertificateOutlined className="text-xs" />
-              <span>{isArabic ? 'تقرير الثغرات والحلول' : 'Audit Report'}</span>
-              {auditReport && (
-                <span
-                  className={`font-mono font-bold text-[10px] px-1.5 py-0.2 rounded ${
-                    auditReport.score >= 80
-                      ? 'bg-[#162312] text-[#52c41a]'
-                      : auditReport.score >= 60
-                      ? 'bg-[#2b2111] text-[#faad14]'
-                      : 'bg-[#2a1215] text-[#ff4d4f]'
-                  }`}
-                >
-                  {auditReport.score}/100
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* Quick Engine Meta */}
-          <div className="hidden sm:flex items-center gap-2 text-xs text-[#8c8c8c] font-mono">
-            <span>PROBES: 42</span>
-            <span>•</span>
-            <span>CONCURRENCY: {concurrency}X</span>
-            <span>•</span>
-            <span className="text-[#52c41a]">ZERO-SLOP</span>
-          </div>
-        </div>
-
-        {/* Tab Content Display */}
-        {activeTab === 'cockpit' && (
-          <TargetConfig
-            targetUrl={targetUrl}
-            onTargetUrlChange={setTargetUrl}
-            apiBaseUrl={apiBaseUrl}
-            onApiBaseUrlChange={setApiBaseUrl}
-            endpoints={endpoints}
-            onEndpointsChange={setEndpoints}
-            intensity={intensity}
-            onIntensityChange={setIntensity}
-            concurrency={concurrency}
-            onConcurrencyChange={setConcurrency}
-            delayMs={delayMs}
-            onDelayMsChange={setDelayMs}
-            enabledCategories={enabledCategories}
-            onToggleCategory={handleToggleCategory}
-            onOpenInspector={() => setIsInspectorOpen(true)}
-            onStartAudit={handleStartAudit}
-            onAbortAudit={handleAbortAudit}
-            isRunning={isRunning}
-            lang={lang}
-          />
-        )}
-
-        {activeTab === 'telemetry' && (
-          <div className="space-y-4">
-            <LiveTelemetryConsole
-              events={telemetryEvents}
+      {/* 2. Main Workstation Area (Split Screen) */}
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* ================================================================= */}
+          {/* LEFT PANE (5 COLS): ATTACK SURFACE & TARGET CONFIGURATION        */}
+          {/* ================================================================= */}
+          <div className="lg:col-span-5 space-y-4">
+            <TargetConfig
+              targetUrl={targetUrl}
+              onTargetUrlChange={setTargetUrl}
+              apiBaseUrl={apiBaseUrl}
+              onApiBaseUrlChange={setApiBaseUrl}
+              endpoints={endpoints}
+              onEndpointsChange={setEndpoints}
+              intensity={intensity}
+              onIntensityChange={setIntensity}
+              concurrency={concurrency}
+              onConcurrencyChange={setConcurrency}
+              delayMs={delayMs}
+              onDelayMsChange={setDelayMs}
+              enabledCategories={enabledCategories}
+              onToggleCategory={handleToggleCategory}
+              onOpenInspector={() => setIsInspectorOpen(true)}
+              onStartAudit={handleStartAudit}
+              onAbortAudit={handleAbortAudit}
               isRunning={isRunning}
-              onClear={handleClearLogs}
               lang={lang}
             />
           </div>
-        )}
 
-        {activeTab === 'report' && (
-          <div className="space-y-4">
-            <FindingsSummary report={auditReport} lang={lang} />
+          {/* ================================================================= */}
+          {/* RIGHT PANE (7 COLS): LIVE TELEMETRY TERMINAL & SECURITY REPORT    */}
+          {/* ================================================================= */}
+          <div className="lg:col-span-7 space-y-3.5">
+            {/* View Switcher Header Bar */}
+            <div className="flex items-center justify-between flex-wrap gap-2 bg-[#0c0c0e] p-1.5 rounded-xl border border-white/[0.08]">
+              <div className="flex items-center gap-1">
+                {/* Switcher Tab 1: Live Terminal */}
+                <button
+                  type="button"
+                  onClick={() => setRightView('telemetry')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                    rightView === 'telemetry'
+                      ? 'bg-white/[0.1] text-white font-medium'
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  {isRunning ? (
+                    <SyncOutlined spin className="text-xs text-amber-400" />
+                  ) : (
+                    <CodeOutlined className="text-xs" />
+                  )}
+                  <span>{isArabic ? 'سجل الرصد الحي' : 'Live Telemetry'}</span>
+                  {telemetryEvents.length > 0 && (
+                    <span className="font-mono text-[10px] text-zinc-400">
+                      ({telemetryEvents.length})
+                    </span>
+                  )}
+                </button>
+
+                {/* Switcher Tab 2: Security Findings & AI Remediation */}
+                <button
+                  type="button"
+                  onClick={() => setRightView('report')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                    rightView === 'report'
+                      ? 'bg-white/[0.1] text-white font-medium'
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  <SafetyCertificateOutlined className="text-xs" />
+                  <span>{isArabic ? 'تقرير الثغرات والحلول' : 'Findings & AI'}</span>
+                  {auditReport && (
+                    <span
+                      className={`font-mono font-bold text-[10px] px-1.5 py-0.2 rounded ${
+                        auditReport.score >= 80
+                          ? 'bg-emerald-500/10 text-emerald-400'
+                          : auditReport.score >= 60
+                          ? 'bg-amber-500/10 text-amber-400'
+                          : 'bg-red-500/10 text-red-400'
+                      }`}
+                    >
+                      {auditReport.score}/100
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {/* Status Indicator */}
+              <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-500">
+                {isRunning ? (
+                  <span className="text-amber-400 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                    <span>AUDITING LIVE</span>
+                  </span>
+                ) : auditReport ? (
+                  <span className="text-emerald-400 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>AUDIT COMPLETE</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                    <span>STANDBY</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Active Right Pane Display */}
+            {rightView === 'telemetry' ? (
+              <LiveTelemetryConsole
+                events={telemetryEvents}
+                isRunning={isRunning}
+                onClear={handleClearLogs}
+                lang={lang}
+              />
+            ) : (
+              <FindingsSummary report={auditReport} lang={lang} />
+            )}
           </div>
-        )}
+        </div>
       </main>
 
       {/* 3. Footer */}
-      <footer className="border-t border-[#262626] bg-[#0c0d12] py-4 text-center text-xs text-[#8c8c8c]">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="border-t border-white/[0.08] bg-black py-3 text-center text-xs text-zinc-600 mt-auto">
+        <div className="max-w-[1600px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>
             {isArabic
-              ? 'SecuriPulse — منصة محاكاة الهجمات السيبرانية وفحص الثغرات الحقيقية'
-              : 'SecuriPulse — Enterprise Defensive Threat Simulator & Real Vulnerability Auditor'}
+              ? 'SecuriPulse — محاكي التهديدات وفاحص أمان الواجهات ونقاط الـ API'
+              : 'SecuriPulse — Defensive Threat Simulator & API Security Auditor'}
           </span>
-          <span className="font-mono text-[11px] text-[#595959]">
-            DEVSEC OPS 2026 • ZERO AI SLOP
+          <span className="font-mono text-[11px] text-zinc-600">
+            v2.6 PRODUCTION
           </span>
         </div>
       </footer>
