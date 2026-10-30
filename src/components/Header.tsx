@@ -35,27 +35,27 @@ export default function Header({
   const isArabic = lang === 'ar';
 
   return (
-    <header className="border-b border-white/[0.08] bg-black sticky top-0 z-40">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
+    <header className="border-b border-white/[0.1] bg-[#0c0c0e] sticky top-0 z-40">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand Identity */}
         <BrandLogo lang={lang} size="sm" />
 
         {/* Action Tools */}
-        <div className="flex items-center gap-2">
-          {/* Running Status Indicator */}
+        <div className="flex items-center gap-2.5">
+          {/* Running Status Pill */}
           {isRunning && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono">
               <SyncOutlined spin className="text-[11px]" />
               <span>{isArabic ? 'جاري الفحص المباشر...' : 'Auditing...'}</span>
             </div>
           )}
 
-          {/* Overall Score if completed */}
+          {/* Overall Score Badge */}
           {score !== null && !isRunning && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/[0.04] border border-white/[0.08] text-xs font-mono">
-              <span className="text-zinc-500">{isArabic ? 'التقييم:' : 'Score:'}</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-xs font-mono">
+              <span className="text-zinc-400">{isArabic ? 'التقييم:' : 'Score:'}</span>
               <span
-                className={`font-bold ${
+                className={`font-bold text-sm ${
                   score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-red-400'
                 }`}
               >
@@ -68,23 +68,20 @@ export default function Header({
           <button
             type="button"
             onClick={onOpenRecipes}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-200 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.15] transition-all cursor-pointer shadow-sm active:scale-95"
           >
-            <BookOutlined className="text-xs" />
-            <span className="hidden sm:inline">
-              {isArabic ? 'أكواد الحماية' : 'Defense Recipes'}
-            </span>
+            <BookOutlined className="text-xs text-zinc-400" />
+            <span>{isArabic ? 'أكواد الحماية' : 'Defense Blueprints'}</span>
           </button>
 
-          {/* Language Switcher */}
+          {/* Language Switcher Button */}
           <button
             type="button"
             onClick={onToggleLang}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-white bg-transparent hover:bg-white/[0.04] transition-colors cursor-pointer"
-            title={isArabic ? 'Switch to English' : 'التحويل للعربية'}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.18] transition-all cursor-pointer shadow-sm active:scale-95"
           >
-            <GlobalOutlined className="text-xs" />
-            <span className="font-mono uppercase">{lang}</span>
+            <GlobalOutlined className="text-xs text-zinc-300" />
+            <span className="font-semibold">{isArabic ? 'English' : 'العربية'}</span>
           </button>
         </div>
       </div>

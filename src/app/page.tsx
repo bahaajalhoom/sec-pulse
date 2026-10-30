@@ -268,26 +268,26 @@ export default function HomePage() {
           {/* ================================================================= */}
           <div className="lg:col-span-7 space-y-3.5">
             {/* View Switcher Header Bar */}
-            <div className="flex items-center justify-between flex-wrap gap-2 bg-[#0c0c0e] p-1.5 rounded-xl border border-white/[0.08]">
-              <div className="flex items-center gap-1">
+            <div className="flex items-center justify-between flex-wrap gap-2 bg-[#0c0c0e] p-2 rounded-xl border border-white/[0.1]">
+              <div className="flex items-center gap-1.5 bg-black p-1 rounded-lg border border-white/[0.08]">
                 {/* Switcher Tab 1: Live Terminal */}
                 <button
                   type="button"
                   onClick={() => setRightView('telemetry')}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                     rightView === 'telemetry'
-                      ? 'bg-white/[0.1] text-white font-medium'
-                      : 'text-zinc-500 hover:text-zinc-300'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   {isRunning ? (
-                    <SyncOutlined spin className="text-xs text-amber-400" />
+                    <SyncOutlined spin className="text-xs text-amber-500" />
                   ) : (
                     <CodeOutlined className="text-xs" />
                   )}
                   <span>{isArabic ? 'سجل الرصد الحي' : 'Live Telemetry'}</span>
                   {telemetryEvents.length > 0 && (
-                    <span className="font-mono text-[10px] text-zinc-400">
+                    <span className="font-mono text-[10px] opacity-75">
                       ({telemetryEvents.length})
                     </span>
                   )}
@@ -297,10 +297,10 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setRightView('report')}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                     rightView === 'report'
-                      ? 'bg-white/[0.1] text-white font-medium'
-                      : 'text-zinc-500 hover:text-zinc-300'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <SafetyCertificateOutlined className="text-xs" />
@@ -309,10 +309,10 @@ export default function HomePage() {
                     <span
                       className={`font-mono font-bold text-[10px] px-1.5 py-0.2 rounded ${
                         auditReport.score >= 80
-                          ? 'bg-emerald-500/10 text-emerald-400'
+                          ? 'bg-emerald-500/20 text-emerald-400'
                           : auditReport.score >= 60
-                          ? 'bg-amber-500/10 text-amber-400'
-                          : 'bg-red-500/10 text-red-400'
+                          ? 'bg-amber-500/20 text-amber-400'
+                          : 'bg-red-500/20 text-red-400'
                       }`}
                     >
                       {auditReport.score}/100
