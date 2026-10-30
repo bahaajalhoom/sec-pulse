@@ -94,11 +94,13 @@ export default function LiveTelemetryConsole({
   const [filter, setFilter] = useState<FilterType>('all');
   const [autoScroll, setAutoScroll] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (autoScroll && terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll the terminal's internal container when new events arrive
+    // Using scrollTop ensures the parent browser window/page is NEVER scrolled!
+    if (autoScroll && containerRef.current && events.length > 0) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [events, autoScroll]);
 
@@ -195,7 +197,10 @@ export default function LiveTelemetryConsole({
       </div>
 
       {/* Terminal Output Area */}
-      <div className="max-h-[520px] min-h-[360px] overflow-y-auto select-text font-mono">
+      <div
+        ref={containerRef}
+        className="max-h-[520px] min-h-[360px] overflow-y-auto select-text font-mono"
+      >
         {filteredEvents.length === 0 ? (
           <div className="h-[360px] flex flex-col items-center justify-center text-center p-8 text-zinc-600 font-mono text-xs">
             <span className="text-zinc-700 text-sm mb-1">$ securipulse --listen</span>
@@ -288,7 +293,6 @@ export default function LiveTelemetryConsole({
             );
           })
         )}
-        <div ref={terminalEndRef} />
       </div>
 
       {/* Terminal Footer */}

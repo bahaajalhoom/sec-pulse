@@ -88,9 +88,18 @@ export default function HomePage() {
   const [telemetryEvents, setTelemetryEvents] = useState<LiveTelemetryEvent[]>([]);
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null);
 
-  // Abort controller ref & results anchor ref
+  // Abort controller ref
   const abortControllerRef = useRef<AbortController | null>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Ensure page always starts at top on initial mount / refresh
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+    }
+  }, []);
 
   // --- Handlers: Category & Probes Management ---
   function handleToggleCategory(cat: VulnerabilityCategory) {
@@ -283,7 +292,7 @@ export default function HomePage() {
         />
 
         {/* 4. Results Section Header & View Mode Switcher */}
-        <div ref={resultsRef} className="pt-4 space-y-4">
+        <div className="pt-4 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-white/[0.1]">
             <div className="flex items-center gap-2 bg-[#0c0c0e] p-1.5 rounded-xl border border-white/[0.1]">
               {/* Tab 1: Live Telemetry */}
