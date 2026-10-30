@@ -195,9 +195,9 @@ export default function LiveTelemetryConsole({
       </div>
 
       {/* Terminal Output Area */}
-      <div className="max-h-[750px] min-h-[600px] overflow-y-auto select-text font-mono">
+      <div className="max-h-[520px] min-h-[360px] overflow-y-auto select-text font-mono">
         {filteredEvents.length === 0 ? (
-          <div className="h-[600px] flex flex-col items-center justify-center text-center p-8 text-zinc-600 font-mono text-xs">
+          <div className="h-[360px] flex flex-col items-center justify-center text-center p-8 text-zinc-600 font-mono text-xs">
             <span className="text-zinc-700 text-sm mb-1">$ securipulse --listen</span>
             <p className="text-zinc-400">
               {isArabic

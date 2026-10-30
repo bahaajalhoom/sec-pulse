@@ -66,20 +66,21 @@ const PRESET_TARGETS = [
 ];
 
 const STYLES = {
-  card: 'rounded-xl border border-white/[0.1] bg-[#0c0c0e] p-4 sm:p-5 space-y-4',
+  card: 'rounded-xl border border-white/[0.1] bg-[#0c0c0e] p-5 space-y-4 shadow-sm',
   input:
-    'w-full rounded-lg border border-white/[0.1] bg-black px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:border-white/40 focus:outline-none font-mono transition-colors',
+    'w-full rounded-lg border border-white/[0.12] bg-black px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-white/50 focus:outline-none font-mono transition-colors',
   primaryLaunchBtn:
-    'w-full py-2.5 px-5 rounded-lg font-bold text-xs text-black bg-white hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 select-none shadow-md active:scale-[0.99]',
+    'w-full py-3.5 px-6 rounded-lg font-bold text-sm text-black bg-white hover:bg-zinc-200 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-40 select-none shadow-lg active:scale-[0.99]',
   abortBtn:
-    'w-full py-2.5 px-5 rounded-lg font-bold text-xs text-red-300 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 transition-all flex items-center justify-center gap-2 cursor-pointer select-none shadow-md active:scale-[0.99]',
+    'w-full py-3.5 px-6 rounded-lg font-bold text-sm text-red-200 bg-red-950/80 hover:bg-red-900 border border-red-700/60 transition-all flex items-center justify-center gap-2.5 cursor-pointer select-none shadow-lg active:scale-[0.99]',
 };
 
-// Grouped vectors with icons
+// Perfectly balanced 4x4 Attack Vectors Grid (4 groups × 4 items = 16 vectors)
 const VECTOR_GROUPS: {
   id: string;
   nameAr: string;
   nameEn: string;
+  tag: string;
   items: {
     cat: VulnerabilityCategory;
     nameAr: string;
@@ -89,8 +90,9 @@ const VECTOR_GROUPS: {
 }[] = [
   {
     id: 'injection',
-    nameAr: 'حقن الأكواد وقواعد البيانات (Injection)',
-    nameEn: 'Code & SQL Injection Canaries',
+    nameAr: 'حقن الأكواد وقواعد البيانات',
+    nameEn: 'Injection & Execution',
+    tag: 'INJECTION',
     items: [
       { cat: 'sqli', nameAr: 'حقن قواعد البيانات', code: 'SQLi', icon: <DatabaseOutlined /> },
       { cat: 'xss', nameAr: 'حقن النصوص البرمجية', code: 'XSS', icon: <CodeOutlined /> },
@@ -100,33 +102,36 @@ const VECTOR_GROUPS: {
   },
   {
     id: 'auth_access',
-    nameAr: 'المصادقة والتحكم بالوصول (Auth)',
-    nameEn: 'Authentication & Access Control',
+    nameAr: 'المصادقة والتحكم بالوصول',
+    nameEn: 'Authentication & Access',
+    tag: 'AUTH',
     items: [
-      { cat: 'auth', nameAr: 'كسر المصادقة وإدارة الجلسات', code: 'Auth', icon: <KeyOutlined /> },
+      { cat: 'auth', nameAr: 'كسر المصادقة والجلسات', code: 'Auth', icon: <KeyOutlined /> },
       { cat: 'idor', nameAr: 'كسر عزل كائنات البيانات', code: 'IDOR', icon: <LockOutlined /> },
       { cat: 'mass_assignment', nameAr: 'التعيين الجماعي للصلاحيات', code: 'MassAssign', icon: <ControlOutlined /> },
+      { cat: 'csrf', nameAr: 'حماية تزوير الطلبات', code: 'CSRF', icon: <SafetyOutlined /> },
     ],
   },
   {
     id: 'network_perimeter',
-    nameAr: 'الشبكة والجدران النارية (Network & Headers)',
-    nameEn: 'Network & Perimeter Security',
+    nameAr: 'الشبكة والجدران النارية',
+    nameEn: 'Network & Perimeter',
+    tag: 'NETWORK',
     items: [
       { cat: 'ssrf', nameAr: 'تزوير طلبات جانب الخادم', code: 'SSRF', icon: <ApiOutlined /> },
-      { cat: 'headers', nameAr: 'ترويسات الحماية وسياسة الأمان', code: 'Headers', icon: <SafetyCertificateOutlined /> },
+      { cat: 'headers', nameAr: 'ترويسات الحماية والأمان', code: 'Headers', icon: <SafetyCertificateOutlined /> },
       { cat: 'ports', nameAr: 'المنافذ الحساسة المكشوفة', code: 'Ports', icon: <CloudServerOutlined /> },
-      { cat: 'cors_leak', nameAr: 'تسريب سياسات النطاق المشترك', code: 'CORS', icon: <ShareAltOutlined /> },
-      { cat: 'csrf', nameAr: 'حماية تزوير الطلبات المتقاطعة', code: 'CSRF', icon: <SafetyOutlined /> },
+      { cat: 'cors_leak', nameAr: 'تسريب سياسات النطاق', code: 'CORS', icon: <ShareAltOutlined /> },
     ],
   },
   {
     id: 'recon_leaks',
-    nameAr: 'تسريب البيانات الحساسة (Leaks & Recon)',
-    nameEn: 'Sensitive Leaks & Infrastructure',
+    nameAr: 'تسريب البيانات والأسرار',
+    nameEn: 'Leaks & Infrastructure',
+    tag: 'RECON',
     items: [
       { cat: 'sensitive_files', nameAr: 'ملفات التكوين والبيئة (.env)', code: '.env/.git', icon: <FileTextOutlined /> },
-      { cat: 'graphql', nameAr: 'كشف مخططات واستعلامات GraphQL', code: 'GraphQL', icon: <ClusterOutlined /> },
+      { cat: 'graphql', nameAr: 'كشف استعلامات GraphQL', code: 'GraphQL', icon: <ClusterOutlined /> },
       { cat: 'rate_limiting', nameAr: 'تقييد معدل الطلبات والصمود', code: 'RateLimit', icon: <FieldTimeOutlined /> },
       { cat: 'subdomain', nameAr: 'الاستحواذ على النطاقات الفرعية', code: 'Subdomain', icon: <GlobalOutlined /> },
     ],
@@ -202,60 +207,68 @@ export default function TargetConfig({
   }
 
   return (
-    <div className="space-y-4">
-      {/* 1. Target URL Omnibar */}
+    <div className="space-y-5">
+      {/* ===================================================================== */}
+      {/* SECTION 1: TARGET WEB URL OMNIBAR                                     */}
+      {/* ===================================================================== */}
       <div className={STYLES.card}>
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-white flex items-center gap-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <label className="text-xs font-bold text-white flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>{isArabic ? 'رابط الموقع أو الواجهة المستهدفة' : 'Target Application URL'}</span>
+            <span>
+              {isArabic
+                ? 'رابط الموقع أو الواجهة المستهدفة (Target URL):'
+                : 'Target Web Application or API URL:'}
+            </span>
           </label>
 
           {/* Radix Dropdown Menu for Target Presets */}
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button
-                type="button"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] transition-colors cursor-pointer select-none"
-              >
-                <span>{isArabic ? 'نماذج جاهزة للفحص' : 'Preset Targets'}</span>
-                <DownOutlined className="text-[10px]" />
-              </button>
-            </DropdownMenu.Trigger>
+          <div className="flex items-center gap-2">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-200 hover:text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.15] transition-all cursor-pointer select-none active:scale-95 shadow-sm"
+                >
+                  <span>{isArabic ? 'نماذج جاهزة للفحص' : 'Preset Targets'}</span>
+                  <DownOutlined className="text-[10px]" />
+                </button>
+              </DropdownMenu.Trigger>
 
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="z-50 min-w-[280px] rounded-xl bg-[#141416] p-1.5 shadow-2xl border border-white/[0.15] text-xs text-zinc-300 font-sans animate-in fade-in-50 zoom-in-95"
-                sideOffset={6}
-                align="end"
-              >
-                <div className="px-2.5 py-1.5 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-                  {isArabic ? 'اختر موقعاً للتجربة المباشرة' : 'Select a live testing target'}
-                </div>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="z-50 min-w-[300px] rounded-xl bg-[#141416] p-2 shadow-2xl border border-white/[0.15] text-xs text-zinc-300 font-sans"
+                  sideOffset={6}
+                  align="end"
+                >
+                  <div className="px-2.5 py-1.5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                    {isArabic ? 'أهداف تجريبية موثوقة' : 'Verified Test Targets'}
+                  </div>
 
-                {PRESET_TARGETS.map((t) => (
-                  <DropdownMenu.Item
-                    key={t.url}
-                    onClick={() => onTargetUrlChange(t.url)}
-                    className="flex flex-col gap-0.5 px-3 py-2 rounded-lg cursor-pointer hover:bg-white/[0.08] hover:text-white outline-none transition-colors"
-                  >
-                    <span className="font-semibold text-white">
-                      {isArabic ? t.nameAr : t.nameEn}
-                    </span>
-                    <span className="text-[11px] text-zinc-500 font-mono truncate" dir="ltr">
-                      {t.url}
-                    </span>
-                  </DropdownMenu.Item>
-                ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+                  {PRESET_TARGETS.map((t) => (
+                    <DropdownMenu.Item
+                      key={t.url}
+                      onClick={() => onTargetUrlChange(t.url)}
+                      className="flex flex-col gap-0.5 px-3 py-2 rounded-lg cursor-pointer hover:bg-white/[0.08] hover:text-white outline-none transition-colors"
+                    >
+                      <span className="font-semibold text-white">
+                        {isArabic ? t.nameAr : t.nameEn}
+                      </span>
+                      <span className="text-[11px] text-zinc-400 font-mono truncate" dir="ltr">
+                        {t.url}
+                      </span>
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          </div>
         </div>
 
-        {/* URL Input */}
+        {/* URL Input Bar */}
         <div className="relative">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-zinc-400">
-            <GlobalOutlined className="text-xs" />
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-zinc-400">
+            <GlobalOutlined className="text-sm" />
           </div>
           <input
             type="text"
@@ -263,251 +276,52 @@ export default function TargetConfig({
             onChange={(e) => onTargetUrlChange(e.target.value)}
             placeholder="https://example.com"
             disabled={isRunning}
-            className={`${STYLES.input} ps-8`}
+            className={`${STYLES.input} ps-10`}
             dir="ltr"
           />
         </div>
 
-        {/* Quick Presets Buttons (Tactile and apparent) */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Quick Clickable Preset Pills */}
+        <div className="flex items-center gap-2 flex-wrap pt-0.5">
+          <span className="text-[11px] text-zinc-400 font-medium">
+            {isArabic ? 'أهداف سريعة للتجربة:' : 'Quick targets:'}
+          </span>
           {PRESET_TARGETS.map((p) => (
             <button
               key={p.url}
               type="button"
               onClick={() => onTargetUrlChange(p.url)}
               disabled={isRunning}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium text-zinc-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] transition-all cursor-pointer select-none active:scale-95"
-            >
-              <span>{isArabic ? p.nameAr.split(' ')[0] : p.nameEn.split(' ')[0]}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Launch / Abort Action */}
-        <div className="pt-1">
-          {isRunning ? (
-            <button
-              type="button"
-              onClick={onAbortAudit}
-              className={STYLES.abortBtn}
-            >
-              <StopOutlined className="text-xs" />
-              <span>{isArabic ? 'إيقاف الفحص المباشر' : 'Abort Audit Stream'}</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onStartAudit}
-              disabled={!targetUrl.trim()}
-              className={STYLES.primaryLaunchBtn}
-            >
-              <PlayCircleOutlined className="text-sm" />
-              <span>{isArabic ? 'بدء فحص الأمان الشامل' : 'Start Full Security Audit'}</span>
-              <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-black/10 text-black">
-                {INTENSITY_PROFILES[intensity].probesCount} Probes
-              </span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Attack Profile & Pacing Bar */}
-      <div className={STYLES.card}>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-white flex items-center gap-1.5">
-              <ThunderboltOutlined className="text-xs text-zinc-400" />
-              <span>{isArabic ? 'مستوى شدة الهجوم:' : 'Audit Profile:'}</span>
-            </span>
-            <span className="font-mono text-zinc-400 text-[11px]">
-              {INTENSITY_PROFILES[intensity].probesCount} Probes Active
-            </span>
-          </div>
-
-          {/* Segmented Intensity Switcher */}
-          <div className="grid grid-cols-3 gap-1.5 bg-black p-1 rounded-lg border border-white/[0.1]">
-            {(['gentle', 'standard', 'rigorous'] as AttackIntensity[]).map((lvl) => {
-              const prof = INTENSITY_PROFILES[lvl];
-              const isSelected = intensity === lvl;
-              return (
-                <button
-                  key={lvl}
-                  type="button"
-                  onClick={() => onIntensityChange(lvl)}
-                  disabled={isRunning}
-                  className={`py-2 px-2.5 rounded-md text-xs font-medium transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
-                    isSelected
-                      ? 'bg-white text-black font-bold shadow-sm'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <span className="text-xs">{isArabic ? prof.labelAr.split(' ')[0] : prof.labelEn.split(' ')[0]}</span>
-                  <span className="font-mono text-[10px] opacity-75">({prof.probesCount} فحص)</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Concurrency & Pacing Segmented Controls */}
-        <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/[0.08]">
-          {/* Concurrency */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-zinc-400">
-              <span>{isArabic ? 'التزامن (Workers):' : 'Concurrency:'}</span>
-              <span className="font-mono text-white font-semibold">{concurrency}x</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1 bg-black p-1 rounded-md border border-white/[0.08]">
-              {[1, 2, 4, 8].map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => onConcurrencyChange(t)}
-                  disabled={isRunning}
-                  className={`py-1 rounded font-mono text-xs transition-all cursor-pointer ${
-                    concurrency === t
-                      ? 'bg-white text-black font-bold'
-                      : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {t}x
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Delay */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-zinc-400">
-              <span>{isArabic ? 'المهلة بين الحزم:' : 'Packet Delay:'}</span>
-              <span className="font-mono text-white font-semibold">{delayMs}ms</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1 bg-black p-1 rounded-md border border-white/[0.08]">
-              {[0, 50, 150, 350].map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => onDelayMsChange(d)}
-                  disabled={isRunning}
-                  className={`py-1 rounded font-mono text-xs transition-all cursor-pointer ${
-                    delayMs === d
-                      ? 'bg-white text-black font-bold'
-                      : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {d}m
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Security Vector Matrix with CLEAR APPARENT BUTTONS */}
-      <div className={STYLES.card}>
-        <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
-          <div className="flex items-center gap-2">
-            <SlidersOutlined className="text-xs text-zinc-400" />
-            <span className="text-xs font-bold text-white">
-              {isArabic ? 'نطاقات الفحص الأمني' : 'Security Attack Vectors'}
-            </span>
-            <span className="font-mono text-[11px] text-zinc-400">
-              ({totalEnabled} / 16)
-            </span>
-          </div>
-
-          {/* REAL, PROMINENT BUTTONS FOR SELECT ALL / CLEAR ALL */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleToggleAll(true)}
-              disabled={isRunning}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-sm active:scale-95 ${
-                isAllEnabled
-                  ? 'bg-white text-black border border-white'
-                  : 'bg-white/[0.08] hover:bg-white/[0.16] text-white border border-white/[0.2]'
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono transition-all cursor-pointer select-none active:scale-95 ${
+                targetUrl === p.url
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.1]'
               }`}
             >
-              <CheckSquareOutlined className={isAllEnabled ? 'text-black text-xs' : 'text-emerald-400 text-xs'} />
-              <span>{isArabic ? 'تحديد الكل' : 'Select All'}</span>
+              <span>{p.url.replace('https://', '')}</span>
             </button>
-
-            <button
-              type="button"
-              onClick={() => handleToggleAll(false)}
-              disabled={isRunning || totalEnabled === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.18] transition-all cursor-pointer disabled:opacity-30 active:scale-95 shadow-sm"
-            >
-              <CloseSquareOutlined className="text-xs text-zinc-400" />
-              <span>{isArabic ? 'إلغاء التحديد' : 'Clear All'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Vectors List */}
-        <div className="space-y-3.5">
-          {VECTOR_GROUPS.map((sec) => (
-            <div key={sec.id} className="space-y-1.5">
-              <span className="text-[11px] font-bold text-zinc-400 block pb-0.5">
-                {isArabic ? sec.nameAr : sec.nameEn}
-              </span>
-
-              <div className="space-y-1">
-                {sec.items.map((item) => {
-                  const isEnabled = enabledCategories[item.cat];
-                  return (
-                    <button
-                      key={item.cat}
-                      type="button"
-                      onClick={() => onToggleCategory(item.cat)}
-                      disabled={isRunning}
-                      className={`w-full py-2 px-3 rounded-lg border text-start flex items-center justify-between transition-all cursor-pointer select-none ${
-                        isEnabled
-                          ? 'bg-white/[0.06] border-white/[0.15] text-white hover:bg-white/[0.09]'
-                          : 'bg-black border-white/[0.05] text-zinc-500 hover:text-zinc-300 hover:border-white/[0.1]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                            isEnabled
-                              ? 'bg-white border-white text-black'
-                              : 'border-zinc-600 bg-transparent'
-                          }`}
-                        >
-                          {isEnabled && <CheckOutlined className="text-[9px] font-bold" />}
-                        </div>
-                        <span className="text-xs font-medium">
-                          {isArabic ? item.nameAr : item.code}
-                        </span>
-                      </div>
-
-                      <span className="font-mono text-[10px] text-zinc-400 bg-black/40 px-1.5 py-0.5 rounded border border-white/[0.05]">
-                        {item.code}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           ))}
         </div>
       </div>
 
-      {/* 4. Automated API Discovery Drawer */}
+      {/* ===================================================================== */}
+      {/* SECTION 1.5: AUTOMATED API & ENDPOINT DISCOVERY PANEL                 */}
+      {/* ===================================================================== */}
       <div className="rounded-xl border border-white/[0.1] bg-[#0c0c0e] overflow-hidden">
         <button
           type="button"
           onClick={() => setShowApiDiscovery(!showApiDiscovery)}
-          className="w-full p-4 flex items-center justify-between text-start cursor-pointer hover:bg-white/[0.04] transition-colors"
+          className="w-full p-4 flex items-center justify-between text-start cursor-pointer hover:bg-white/[0.03] transition-colors"
         >
-          <div className="flex items-center gap-2">
-            <ApiOutlined className="text-xs text-zinc-300" />
+          <div className="flex items-center gap-2.5">
+            <ApiOutlined className="text-sm text-blue-400" />
             <span className="text-xs font-bold text-white">
-              {isArabic ? 'مستكشف نهايات الـ API الحقيقية' : 'Real API Discovery Engine'}
+              {isArabic
+                ? 'مستكشف مسارات الـ API والنهايات الحقيقية'
+                : 'Real API & Route Discovery Engine'}
             </span>
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-zinc-300">
-              {endpoints.length} routes
+            <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-zinc-300">
+              {endpoints.length} {isArabic ? 'مسارات مكتشفة' : 'routes'}
             </span>
           </div>
           <div className="text-xs text-zinc-400">
@@ -530,21 +344,285 @@ export default function TargetConfig({
         )}
       </div>
 
-      {/* 5. Custom Payloads Inspector */}
-      <div className="rounded-xl border border-white/[0.1] bg-[#0c0c0e] p-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <SettingOutlined className="text-xs text-zinc-300" />
-          <span className="text-xs font-semibold text-white">
-            {isArabic ? 'محرر الحمولات والـ Payloads (42 فحص)' : '42 Security Probes Inspector'}
+      {/* ===================================================================== */}
+      {/* SECTION 2: ATTACK INTENSITY PROFILES (3 CARDS SIDE-BY-SIDE)           */}
+      {/* ===================================================================== */}
+      <div className={STYLES.card}>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-white flex items-center gap-2">
+            <ThunderboltOutlined className="text-xs text-blue-400" />
+            <span>
+              {isArabic ? 'مستوى صعوبة وشدة الهجوم:' : 'Attack Intensity Profile:'}
+            </span>
+          </label>
+          <span className="text-[11px] font-mono text-zinc-400">
+            {INTENSITY_PROFILES[intensity].probesCount} {isArabic ? 'فحص نشط' : 'Active Probes'}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onOpenInspector}
-          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.15] transition-all cursor-pointer shadow-sm active:scale-95"
-        >
-          {isArabic ? 'تعديل الأكواد' : 'Edit Probes'}
-        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {(['gentle', 'standard', 'rigorous'] as AttackIntensity[]).map((level) => {
+            const profile = INTENSITY_PROFILES[level];
+            const isSelected = intensity === level;
+
+            return (
+              <button
+                key={level}
+                type="button"
+                onClick={() => onIntensityChange(level)}
+                disabled={isRunning}
+                className={`p-4 rounded-xl border text-start transition-all flex flex-col justify-between gap-3 cursor-pointer select-none active:scale-[0.99] ${
+                  isSelected
+                    ? 'bg-white/[0.08] border-white text-white shadow-md'
+                    : 'bg-black border-white/[0.08] text-zinc-400 hover:border-white/[0.2] hover:text-zinc-200'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-bold text-white">
+                    {isArabic ? profile.labelAr : profile.labelEn}
+                  </span>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold ${
+                      isSelected
+                        ? 'bg-white text-black'
+                        : 'bg-white/[0.06] text-zinc-400 border border-white/[0.08]'
+                    }`}
+                  >
+                    {profile.probesCount} {isArabic ? 'فحص' : 'probes'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                  {isArabic ? profile.descriptionAr : profile.descriptionEn}
+                </p>
+                <div className="text-[10px] font-mono text-zinc-500 pt-1 border-t border-white/[0.05]">
+                  {isArabic ? profile.recommendedFor : 'Recommended environment'}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Concurrency & Pacing Segmented Dials */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/[0.08]">
+          {/* Concurrency Threads */}
+          <div className="p-3.5 rounded-lg bg-black border border-white/[0.08] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-zinc-300">
+                {isArabic ? 'الهجمات المتزامنة (Concurrency):' : 'Concurrent Workers:'}
+              </span>
+              <span className="font-mono text-xs font-bold text-white bg-white/[0.1] px-2 py-0.5 rounded">
+                {concurrency}x
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 bg-[#0c0c0e] p-1 rounded-md border border-white/[0.08]">
+              {[1, 2, 4, 8].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => onConcurrencyChange(t)}
+                  disabled={isRunning}
+                  className={`py-1.5 rounded font-mono text-xs font-semibold transition-all cursor-pointer ${
+                    concurrency === t
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {t}x
+                </button>
+              ))}
+            </div>
+            <p className="text-[10.5px] text-zinc-500">
+              {isArabic
+                ? 'توزيع حزم الهجوم عبر عدة خيوط متوازية لتسريع الفحص واختبار الصمود.'
+                : 'Parallelize probe requests across multiple asynchronous threads.'}
+            </p>
+          </div>
+
+          {/* Pacing Delay */}
+          <div className="p-3.5 rounded-lg bg-black border border-white/[0.08] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-zinc-300">
+                {isArabic ? 'فترة التهدئة (Pacing Delay):' : 'Request Delay:'}
+              </span>
+              <span className="font-mono text-xs font-bold text-white bg-white/[0.1] px-2 py-0.5 rounded">
+                {delayMs} ms
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 bg-[#0c0c0e] p-1 rounded-md border border-white/[0.08]">
+              {[0, 50, 150, 350].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => onDelayMsChange(d)}
+                  disabled={isRunning}
+                  className={`py-1.5 rounded font-mono text-xs font-semibold transition-all cursor-pointer ${
+                    delayMs === d
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {d}ms
+                </button>
+              ))}
+            </div>
+            <p className="text-[10.5px] text-zinc-500">
+              {isArabic
+                ? 'تحديد فترة زمنية بين الطلبات لتجنب حظر الـ Rate Limiting بجدار الحماية.'
+                : 'Interval spacing between packets to prevent triggering strict rate limiters.'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* SECTION 3: 4x4 SECURITY ATTACK VECTORS MATRIX                         */}
+      {/* ===================================================================== */}
+      <div className={STYLES.card}>
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-white/[0.08]">
+          <div className="flex items-center gap-2.5">
+            <SlidersOutlined className="text-sm text-blue-400" />
+            <span className="text-xs font-bold text-white">
+              {isArabic ? 'نطاقات الفحص الأمني المشمولة بالهجوم' : 'Included Security Attack Vectors'}
+            </span>
+            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-white/[0.08] text-zinc-300 border border-white/[0.1]">
+              {totalEnabled} / 16 {isArabic ? 'مفعلة' : 'Active'}
+            </span>
+          </div>
+
+          {/* REAL, PROMINENT BUTTONS FOR SELECT ALL / CLEAR ALL */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleToggleAll(true)}
+              disabled={isRunning}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95 ${
+                isAllEnabled
+                  ? 'bg-white text-black border border-white'
+                  : 'bg-white/[0.1] hover:bg-white/[0.18] text-white border border-white/[0.25]'
+              }`}
+            >
+              <CheckSquareOutlined className="text-xs" />
+              <span>{isArabic ? 'تحديد الكل' : 'Select All'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleToggleAll(false)}
+              disabled={isRunning || totalEnabled === 0}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.18] transition-all cursor-pointer disabled:opacity-30 active:scale-95 shadow-sm"
+            >
+              <CloseSquareOutlined className="text-xs text-zinc-400" />
+              <span>{isArabic ? 'إلغاء التحديد' : 'Clear All'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* The 4-Column Symmetrical Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {VECTOR_GROUPS.map((sec) => (
+            <div
+              key={sec.id}
+              className="p-3 rounded-xl bg-black border border-white/[0.08] space-y-2 flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between pb-1.5 border-b border-white/[0.06]">
+                <span className="text-[11px] font-bold text-zinc-200 truncate">
+                  {isArabic ? sec.nameAr : sec.nameEn}
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-500">
+                  {sec.tag}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 flex-1">
+                {sec.items.map((item) => {
+                  const isEnabled = enabledCategories[item.cat];
+                  return (
+                    <button
+                      key={item.cat}
+                      type="button"
+                      onClick={() => onToggleCategory(item.cat)}
+                      disabled={isRunning}
+                      className={`w-full p-2.5 rounded-lg border text-start flex items-center justify-between transition-all cursor-pointer select-none active:scale-[0.98] ${
+                        isEnabled
+                          ? 'bg-white/[0.08] border-white/[0.2] text-white hover:bg-white/[0.12]'
+                          : 'bg-[#08080a] border-white/[0.04] text-zinc-500 hover:text-zinc-300 hover:border-white/[0.1]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                            isEnabled
+                              ? 'bg-white border-white text-black'
+                              : 'border-zinc-700 bg-transparent'
+                          }`}
+                        >
+                          {isEnabled && <CheckOutlined className="text-[9px] font-bold" />}
+                        </div>
+                        <span className="text-xs font-medium truncate">
+                          {isArabic ? item.nameAr : item.code}
+                        </span>
+                      </div>
+
+                      <span className="font-mono text-[10px] text-zinc-400 bg-black/60 px-1.5 py-0.5 rounded border border-white/[0.06] shrink-0 ms-1.5">
+                        {item.code}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* SECTION 4: PRIMARY LAUNCH ACTION BAR                                  */}
+      {/* ===================================================================== */}
+      <div className="space-y-3">
+        {isRunning ? (
+          <button
+            type="button"
+            onClick={onAbortAudit}
+            className={STYLES.abortBtn}
+          >
+            <StopOutlined className="text-base" />
+            <span>{isArabic ? 'إيقاف الفحص المباشر فوراً (Abort Stream)' : 'Abort Live Audit'}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onStartAudit}
+            disabled={!targetUrl.trim() || totalEnabled === 0}
+            className={STYLES.primaryLaunchBtn}
+          >
+            <PlayCircleOutlined className="text-base" />
+            <span>
+              {isArabic ? 'بدء فحص الأمان الشامل والمحاكاة الحية' : 'Launch Full Security Audit'}
+            </span>
+            <span className="font-mono text-xs px-2.5 py-0.5 rounded bg-black text-white font-bold">
+              {INTENSITY_PROFILES[intensity].probesCount} Probes Active
+            </span>
+          </button>
+        )}
+
+        {/* Custom Payloads Inspector Trigger */}
+        <div className="flex items-center justify-between px-4 py-2.5 rounded-lg bg-black border border-white/[0.08] text-xs text-zinc-400">
+          <div className="flex items-center gap-2">
+            <SettingOutlined className="text-xs text-zinc-400" />
+            <span>
+              {isArabic
+                ? 'محرر الحمولات والـ Payloads (42 فحص قياسي)'
+                : 'Custom Payload Editor & 42 Canary Suite'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenInspector}
+            className="text-xs font-semibold px-3 py-1 rounded-md bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/[0.12] transition-colors cursor-pointer active:scale-95"
+          >
+            {isArabic ? 'تعديل الأكواد' : 'Edit Probes'}
+          </button>
+        </div>
       </div>
     </div>
   );
